@@ -1,0 +1,15 @@
+{
+  "main.css": "/slacker/static/css/main.65f34b2b.chunk.css",
+  "main.js": "/slacker/static/js/main.8cdc15bf.chunk.js",
+  "main.js.map": "/slacker/static/js/main.8cdc15bf.chunk.js.map",
+  "runtime~main.js": "/slacker/static/js/runtime~main.86673fd6.js",
+  "runtime~main.js.map": "/slacker/static/js/runtime~main.86673fd6.js.map",
+  "static/css/2.168cdb51.chunk.css": "/slacker/static/css/2.168cdb51.chunk.css",
+  "static/js/2.1ba97405.chunk.js": "/slacker/static/js/2.1ba97405.chunk.js",
+  "static/js/2.1ba97405.chunk.js.map": "/slacker/static/js/2.1ba97405.chunk.js.map",
+  "index.html": "/slacker/index.html",
+  "precache-manifest.f637a8c51f5dd0086f593303588e818e.js": "/slacker/precache-manifest.f637a8c51f5dd0086f593303588e818e.js",
+  "service-worker.js": "/slacker/service-worker.js",
+  "static/css/2.168cdb51.chunk.css.map": "/slacker/static/css/2.168cdb51.chunk.css.map",
+  "static/css/main.65f34b2b.chunk.css.map": "/slacker/static/css/main.65f34b2b.chunk.css.map"
+}
