@@ -10,7 +10,7 @@ import { initSlacker } from '../actions/rooms'
 import '../styles/index.css'
 
 const { Sider } = Layout
-const { Text } = Typography
+// const { Text } = Typography
 
 const ButtonWrap = styled.div`
 	text-align: center;

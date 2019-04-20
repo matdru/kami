@@ -9,6 +9,7 @@
     "@types/styled-components": "^4.1.14",
     "antd": "latest",
     "firebase": "^5.9.4",
+    "gh-pages": "^2.0.1",
     "moment": "^2.24.0",
     "react": "latest",
     "react-dom": "latest",
@@ -23,6 +24,7 @@
   "name": "slacker",
   "description": "playground firebase chat app",
   "version": "0.0.0",
+  "homepage": "https://matdru.github.io/slacker",
   "devDependencies": {
     "react-scripts": "^2.1.8"
   },
@@ -30,7 +32,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "yarn run build",
+    "deploy": "gh-pages -d build"
   },
   "browserslist": [
     ">0.2%",
