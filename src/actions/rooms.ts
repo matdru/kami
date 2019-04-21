@@ -26,9 +26,13 @@ export const createRoom = ({ id, name, people, messages = [] }: RoomData) => ({
 	},
 })
 
+export const joinedRoom = (joinedRoom: RoomItem) => ({
+	type: 'JOINED_ROOM',
+	joinedRoom
+})
+
 export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {
-	return (dispatch: any, getState: any) => {
-		console.log('Attempting to create room...')
+	return (dispatch: any, getState: () => StoreState) => {
 		const room = {
 			name: roomData.name,
 		}
@@ -96,11 +100,11 @@ export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {
 }
 
 export const startListening = (roomId: string) => {
-	return (dispatch: any, getState: any) => {
+	return (dispatch: any, getState: () => StoreState) => {
 		return database
 			.collection(`rooms/${roomId}/messages`)
 			.onSnapshot(messagesQuery => {
-				if (getState().rooms.find((room: Room) => room.id === roomId)) {
+				if (getState().rooms.joined.find(room => room.id === roomId)) {
 					database
 						.collection(`rooms/${roomId}/people`)
 						.get()
@@ -111,8 +115,8 @@ export const startListening = (roomId: string) => {
 							})
 							console.log('listener -> ', { messages })
 							messages.sort(byCreatedAt)
-							dispatch(updateMessages(messages, roomId))
-							return
+							return dispatch(updateMessages(messages, roomId))
+							
 							// dispatch(
 							// 	sendMessage(
 							// 		{
@@ -183,64 +187,72 @@ const isAlreadyAdded = (data: any, id: string) => {
 	return false
 }
 
-// export const startJoinRoom = (data: Room, showJoinError: any) => {
-// 	return (dispatch: any, getState: any) => {
-// 		const state = getState()
-// 		return database.ref(`rooms/${data.roomName}`).once('value', snapshot => {
-// 			const value = snapshot.val()
-// 			const id = data.id || ''
-// 			if (value === null) {
-// 				return showJoinError('Room not found!')
-// 			} else if (value.people && value.people[id]) {
-// 				// history.push(`room/${data.roomName}`);
-// 			} else {
-// 				dispatch(startListening(data.roomName))
-// 				const person = {
-// 					name: data.name,
-// 					id: data.id,
-// 					unread: data.unread,
-// 					lastRead: 0,
-// 				}
-// 				let people: any[] = []
-// 				let messages: any[] = []
-// 				for (var key in value.people) {
-// 					people.push({
-// 						id: value.people[key].id,
-// 						name: value.people[key].name,
-// 						unread: value.people[key].unread,
-// 						lastRead: value.people[key].lastRead,
-// 					})
-// 				}
-// 				for (var key in value.messages) {
-// 					messages.push({
-// 						...value.messages[key],
-// 					})
-// 				}
-// 				return database
-// 					.ref(`rooms/${data.roomName}/people/${person.id}`)
-// 					.set(person)
-// 					.then(ref => {
-// 						database
-// 							.ref(`users/${person.id}/rooms/${data.roomName}`)
-// 							.set({ roomName: data.roomName })
+export const showError = (message: string) => ({
+		type: 'ERROR_MESSAGE',
+		message
+})
 
-// 						dispatch(
-// 							createRoom({
-// 								people: [...people, person],
-// 								name: data.roomName,
-// 								messages,
-// 							}),
-// 						)
-// 						const perName = person.name
+export const tryJoinRoom = (roomId: string) => {
+	return (dispatch: any, getState: () => StoreState) => {
+		const auth = getState().auth
+		return database.doc(`rooms/${roomId}`).get().then(doc => {
+			const room = <Optional<RoomItem>>doc.data()
+			if (!room || !doc.exists) {
+				return dispatch(showError('Room not found!'))
+			} else if (room.people && room.people.find(person => person.id === auth.uid)) {
+				// if we are already in this room then
+				// history.push(`room/${data.roomName}`);
+			} else {
+				dispatch(startListening(roomId))
+				const person = {
+					name: auth.displayName || 'Error',
+					id: auth.uid || 'Error',
+					unread: 0,
+					lastRead: 0,
+				}
+				// let people: any[] = []
+				// let messages: any[] = []
+				// for (var key in room.people) {
+				// 	people.push({
+				// 		id: room.people[key].id,
+				// 		name: room.people[key].name,
+				// 		unread: room.people[key].unread,
+				// 		lastRead: room.people[key].lastRead,
+				// 	})
+				// }
+				// for (var key in room.messages) {
+				// 	messages.push({
+				// 		...room.messages[key],
+				// 	})
+				// }
+				return database
+					.doc(`rooms/${roomId}/people/${person.id}`)
+					.set(person)
+					.then(ref => {
+						database
+							.doc(`users/${person.id}/rooms/${roomId}`)
+							.set({ roomName: room.name })
 
-// 						dispatch(startSendMessage(`${perName} joined`, data.roomName, true))
+						const updatedRoom: RoomItem = {
+							id: room.id,
+							name: room.name,
+							people: [...room.people, person],
+							messages: room.messages
+						}
 
-// 						// history.push(`room/${data.roomName}`);
-// 					})
-// 			}
-// 		})
-// 	}
-// }
+						dispatch(
+							joinedRoom(updatedRoom),
+						)
+						//const perName = person.name
+
+						// dispatch(startSendMessage(`${perName} joined`, data.roomName, true))
+
+						// history.push(`room/${data.roomName}`);
+					})
+			}
+		})
+	}
+}
 
 export const sendMessage = (message: any, roomName: string) => ({
 	type: 'SEND_MESSAGE',
@@ -279,70 +291,14 @@ export const orderRoomsStartState = () => ({
 	type: 'ORDER_ROOMS_START_STATE',
 })
 
-export const initSlacker = () => {
-	return (dispatch: any, getState: any) => {
-		// console.log('initializing slacker')
-		const uid = getState().auth.uid
-		if (uid) {
-			// console.log('user found, ', uid)
-			const usersRef = database.collection('users')
-			return usersRef
-				.doc(uid)
-				.collection('rooms')
-				.get()
-				.then(userRoomsQuery => {
-					if (!userRoomsQuery.empty) {
-						userRoomsQuery.forEach(userRoomDoc => {
-							const roomRef = database.collection('rooms').doc(userRoomDoc.id)
+export const availableRooms = (rooms: RoomItem[]) => ({
+	type: 'AVAILABLE_ROOMS',
+	rooms
+})
 
-							roomRef.get().then(roomDoc => {
-								if (roomDoc.exists) {
-									const room = roomDoc.data()
-									const people: any[] = []
-									const messages: any[] = []
-									roomRef
-										.collection('people')
-										.get()
-										.then(peopleQuery => {
-											peopleQuery.forEach(peopleDoc => {
-												people.push(peopleDoc.data())
-											})
-											console.log({ people })
-										})
-										.then(() => {
-											roomRef
-												.collection('messages')
-												.get()
-												.then(messagesQuery => {
-													messagesQuery.forEach(messageDoc => {
-														messages.push({
-															id: messageDoc.id,
-															...messageDoc.data(),
-														})
-													})
-													messages.sort(byCreatedAt)
-													console.log({ messages })
-
-													dispatch(
-														createRoom({
-															id: roomRef.id,
-															name: room ? room.name : 'Error',
-															people,
-															messages,
-														}),
-													)
-
-													dispatch(startListening(roomRef.id))
-												})
-										})
-								}
-							})
-						})
-					}
-				})
-		}
-	}
-}
+export const initSlacker = () => ({
+	type: 'INIT_SLACKER_SAGA'
+})
 
 export const clearState = {
 	type: 'CLEAR_STATE',
@@ -424,3 +380,14 @@ export const onJoined = (roomName: string, person: any) => ({
 	roomName,
 	person,
 })
+
+
+export const syncMessages = (messagesSnapshot: any, roomId: string) => {
+	const messages: any[] = []
+	messagesSnapshot.forEach((doc: any) => {
+		messages.push({ id: doc.id, ...doc.data() })
+	})
+	console.log('saga message listener -> ', { messages })
+	messages.sort(byCreatedAt)
+	return updateMessages(messages, roomId)
+}

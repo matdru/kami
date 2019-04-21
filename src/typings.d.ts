@@ -1,3 +1,5 @@
+type Optional<T> = T | undefined
+
 interface Room {
 	id?: string;
 	people: any;
@@ -8,12 +10,20 @@ interface Room {
 	unread?: any;
 }
 
-interface User {
-	displayName: string;
-}
-
 interface Person {
 	id: string;
+	name: string;
+	lastRead: number;
+	unread: number;
+	displayName?: string;
+}
+
+interface Message {
+	id: string;
+	createdAt: Date;
+	sender: Auth;
+	status: boolean;
+	text: string;
 }
 
 interface Auth {
@@ -24,11 +34,14 @@ interface Auth {
 interface RoomItem {
 	id: string;
 	name: string;
-	people: any[];
-	messages: any[];
+	people: Person[];
+	messages: Message[];
 }
 
 interface StoreState {
 	auth: Auth;
-	rooms: RoomItem[];
+	rooms: {
+		joined: RoomItem[],
+		available: RoomItem[],
+	};
 }

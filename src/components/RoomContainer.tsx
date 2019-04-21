@@ -183,7 +183,7 @@ class RoomContainer extends Component<Props> {
 
 const mapStateToProps = (state: StoreState, ownProps: any) => {
 	const { roomId } = ownProps.match.params
-	const room = state.rooms.find(room => room.id === roomId)
+	const room = state.rooms.joined.find(room => room.id === roomId)
 	const messages = room ? room.messages : []
 	return {
 		auth: state.auth,

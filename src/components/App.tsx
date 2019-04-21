@@ -33,7 +33,10 @@ interface Props {
 	tryLogin: () => void;
 	initSlacker: () => void;
 	auth: Auth;
-	rooms: RoomItem[];
+	rooms: {
+		joined: RoomItem[],
+		available: RoomItem[],
+	}
 	history: any;
 	location: {
 		pathname: any,
@@ -108,7 +111,7 @@ class App extends Component<Props> {
 						onSelect={this.handleRoomSelect}
 						defaultSelectedKeys={[this.props.location.pathname]}
 					>
-						{this.props.rooms.map(room => (
+						{this.props.rooms.joined.map(room => (
 							<Menu.Item key={`/r/${room.id}`}>
 								<span className="nav-text"># {room.name}</span>
 							</Menu.Item>
