@@ -63,6 +63,7 @@ class RoomContainer extends Component<Props> {
 	}
 
 	messagesEnd: any = null
+	messagesContainer: HTMLElement | null = null
 
 	componentDidMount() {
 		this.scrollToBottom()
@@ -88,10 +89,22 @@ class RoomContainer extends Component<Props> {
 			) {
 				// last message was ours, scroll to the bottom
 				this.scrollToBottom()
+			} else if (this.messagesContainer) {
+				// last message is not ours, lets check scroll
+				const {
+					scrollHeight,
+					scrollTop,
+					offsetHeight,
+					clientHeight,
+				} = this.messagesContainer
+				const calculato = scrollHeight - scrollTop === clientHeight
+
+				// if our scroll is around bottom 2 messages, scroll to bottom pls
+				if (Math.abs(clientHeight - (scrollHeight - scrollTop - 45)) < 45) {
+					this.scrollToBottom()
+				}
 			}
 		}
-
-		// check last message, if its mine, scroll to bottom?
 	}
 
 	handleTyping = (e: any) => {
@@ -123,7 +136,11 @@ class RoomContainer extends Component<Props> {
 		if (!isLoading) {
 			content = (
 				<ChatWrapper>
-					<Messages>
+					<Messages
+						ref={el => {
+							this.messagesContainer = el
+						}}
+					>
 						{messages.map(message => (
 							<Message name={message.sender.displayName} key={message.id}>
 								{message.text}
