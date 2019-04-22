@@ -19,7 +19,8 @@ const ChatWrapper = styled.div`
 
 const Messages = styled.div`
 	flex-grow: 1;
-	overflow: scroll;
+	overflow-y: scroll;
+	overflow-x: hidden;
 `
 
 const Message = styled.div`
