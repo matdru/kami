@@ -14,7 +14,7 @@ export default (state: RoomsState = defaultState, action: any) => {
 	switch (action.type) {
 		case 'CREATE_ROOM':
 			return { ...state, joined: [...state.joined, action.room] }
-		case 'JOIN_ROOM':
+		case 'JOINED_ROOM':
 			return {
 				...state,
 				joined: [...state.joined, action.room],

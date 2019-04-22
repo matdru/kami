@@ -1,14 +1,8 @@
 import { put, select, takeEvery, fork, call } from 'redux-saga/effects'
 import { AnyAction } from 'redux'
 import database, { firebase, rsf } from '../firebase/firebase'
-import {
-	availableRooms,
-	createRoom,
-	updateMessages,
-	joinedRoom,
-	showError,
-	syncMessages,
-} from '../actions/rooms'
+import { joinedRoom, showError, syncMessages } from '../actions/rooms'
+import { fetchRoomSaga } from './initSaga'
 
 const byCreatedAt = function(a: any, b: any) {
 	// @ts-ignore
@@ -37,14 +31,9 @@ function* joinRoom(action: AnyAction) {
 	} else {
 		// we should add ourselves to this room
 
-		// subscribe to messages in separate fork
-		yield fork(rsf.firestore.syncCollection, roomRef.collection('messages'), {
-			successActionCreator: (snapshot: any) => syncMessages(snapshot, roomId),
-		})
-
 		const person = {
-			name: displayName || 'Error',
-			id: uid || 'Error',
+			name: displayName,
+			id: uid,
 			unread: 0,
 			lastRead: 0,
 		}
@@ -64,19 +53,8 @@ function* joinRoom(action: AnyAction) {
 			{ roomName: room.name },
 		)
 
-		console.log(room)
-		console.log('oops that aint gonna work')
-
-		// TODO get people and messages here
-
-		const roomWithPerson: RoomItem = {
-			id: room.id,
-			name: room.name,
-			people: [person],
-			messages: room.messages || [],
-		}
-
-		yield put(joinedRoom(roomWithPerson))
+		// fetch full room and subscribe
+		yield call(fetchRoomSaga, roomId)
 	}
 }
 

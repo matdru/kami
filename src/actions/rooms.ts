@@ -192,68 +192,6 @@ export const showError = (message: string) => ({
 		message
 })
 
-export const tryJoinRoom = (roomId: string) => {
-	return (dispatch: any, getState: () => StoreState) => {
-		const auth = getState().auth
-		return database.doc(`rooms/${roomId}`).get().then(doc => {
-			const room = <Optional<RoomItem>>doc.data()
-			if (!room || !doc.exists) {
-				return dispatch(showError('Room not found!'))
-			} else if (room.people && room.people.find(person => person.id === auth.uid)) {
-				// if we are already in this room then
-				// history.push(`room/${data.roomName}`);
-			} else {
-				dispatch(startListening(roomId))
-				const person = {
-					name: auth.displayName || 'Error',
-					id: auth.uid || 'Error',
-					unread: 0,
-					lastRead: 0,
-				}
-				// let people: any[] = []
-				// let messages: any[] = []
-				// for (var key in room.people) {
-				// 	people.push({
-				// 		id: room.people[key].id,
-				// 		name: room.people[key].name,
-				// 		unread: room.people[key].unread,
-				// 		lastRead: room.people[key].lastRead,
-				// 	})
-				// }
-				// for (var key in room.messages) {
-				// 	messages.push({
-				// 		...room.messages[key],
-				// 	})
-				// }
-				return database
-					.doc(`rooms/${roomId}/people/${person.id}`)
-					.set(person)
-					.then(ref => {
-						database
-							.doc(`users/${person.id}/rooms/${roomId}`)
-							.set({ roomName: room.name })
-
-						const updatedRoom: RoomItem = {
-							id: room.id,
-							name: room.name,
-							people: [...room.people, person],
-							messages: room.messages
-						}
-
-						dispatch(
-							joinedRoom(updatedRoom),
-						)
-						//const perName = person.name
-
-						// dispatch(startSendMessage(`${perName} joined`, data.roomName, true))
-
-						// history.push(`room/${data.roomName}`);
-					})
-			}
-		})
-	}
-}
-
 export const sendMessage = (message: any, roomName: string) => ({
 	type: 'SEND_MESSAGE',
 	message,
@@ -387,7 +325,7 @@ export const syncMessages = (messagesSnapshot: any, roomId: string) => {
 	messagesSnapshot.forEach((doc: any) => {
 		messages.push({ id: doc.id, ...doc.data() })
 	})
-	console.log('saga message listener -> ', { messages })
+
 	messages.sort(byCreatedAt)
 	return updateMessages(messages, roomId)
 }

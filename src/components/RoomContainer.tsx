@@ -1,8 +1,9 @@
 import React, { Fragment, Component } from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { Layout, Typography, Spin } from 'antd'
+import { Layout, Typography } from 'antd'
 
+import LoadingSpinner from './LoadingSpinner'
 import { trySendMessage } from '../actions/rooms'
 
 const { Header, Content } = Layout
@@ -14,16 +15,6 @@ const ChatWrapper = styled.div`
 	display: flex;
 	flex-direction: column;
 	background: '#fff';
-`
-
-const LoadingWrapper = styled.div`
-	height: 100%;
-	padding: 24;
-	display: flex;
-	flex-direction: column;
-	background: '#fff';
-	justify-content: center;
-	align-items: center;
 `
 
 const Messages = styled.div`
@@ -73,26 +64,8 @@ class RoomContainer extends Component<Props> {
 
 	messagesEnd: any = null
 
-	handleTyping = (e: any) => {
-		this.setState({ messageValue: e.target.value })
-	}
-
-	scrollToBottom = () => {
-		if (this.messagesEnd) {
-			this.messagesEnd.scrollIntoView({ behavior: 'auto' })
-		}
-	}
-
-	handleSend = (e: any) => {
-		e.preventDefault()
-		const { room } = this.props
-		if (!!room.id) {
-			const text = this.state.messageValue
-			this.props.trySendMessage(text, room.id)
-			this.setState({
-				messageValue: '',
-			})
-		}
+	componentDidMount() {
+		this.scrollToBottom()
 	}
 
 	componentDidUpdate(prevProps: Props) {
@@ -121,13 +94,33 @@ class RoomContainer extends Component<Props> {
 		// check last message, if its mine, scroll to bottom?
 	}
 
+	handleTyping = (e: any) => {
+		this.setState({ messageValue: e.target.value })
+	}
+
+	scrollToBottom = () => {
+		if (this.messagesEnd) {
+			this.messagesEnd.scrollIntoView({ behavior: 'auto' })
+		}
+	}
+
+	handleSend = (e: any) => {
+		e.preventDefault()
+		const { room } = this.props
+		if (!!room.id) {
+			const text = this.state.messageValue
+			this.props.trySendMessage(text, room.id)
+			this.setState({
+				messageValue: '',
+			})
+		}
+	}
+
 	render() {
 		const { room, messages, isLoading } = this.props
 		// console.log(messages)
 		let content = (
-			<LoadingWrapper>
-				<Spin size="large" />
-			</LoadingWrapper>
+			<LoadingSpinner />
 		)
 		if (!isLoading) {
 			content = (
@@ -165,7 +158,7 @@ class RoomContainer extends Component<Props> {
 					}}
 				>
 					<Title style={{ margin: 0 }} level={3}>
-						{room.name}
+						# {room.name}
 					</Title>
 				</Header>
 				<Content

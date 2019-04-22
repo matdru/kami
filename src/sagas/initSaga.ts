@@ -7,7 +7,7 @@ const byCreatedAt = function(a: any, b: any) {
 	return new Date(a.createdAt) - new Date(b.createdAt)
 }
 
-function* fetchJoinedRoom(roomId: string) {
+export function* fetchRoomSaga(roomId: string) {
 	console.log('try fetch room ', roomId)
 	// fetch joined room from firestore
 	const roomRef = database.collection('rooms').doc(roomId)
@@ -60,7 +60,7 @@ function* fetchJoinedRoom(roomId: string) {
 }
 
 // worker Saga: will be fired on USER_FETCH_REQUESTED actions
-function* initSlacker(action: any) {
+function* initSlackerSaga(action: any) {
 	const auth = yield select(state => state.auth)
 
 	if (!auth.uid) {
@@ -99,7 +99,7 @@ function* initSlacker(action: any) {
 
 		// fetch each joined room
 		for (let roomId of userRoomIds) {
-			const task = yield fork(fetchJoinedRoom, roomId)
+			const task = yield fork(fetchRoomSaga, roomId)
 		}
 
 		// if no general room, join that as well
@@ -122,7 +122,7 @@ function* initSlacker(action: any) {
 }
 
 function* mySaga() {
-	yield takeLatest('INIT_SLACKER_SAGA', initSlacker)
+	yield takeLatest('INIT_SLACKER_SAGA', initSlackerSaga)
 }
 
 export default mySaga

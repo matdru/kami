@@ -1,8 +1,7 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import createSagaMiddleware from 'redux-saga'
-import authReducer from '../reducers/auth'
-import roomsReducer from '../reducers/rooms'
+import reducers from '../reducers'
 
 import mySaga from '../sagas/rootSaga'
 
@@ -14,14 +13,11 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 export default () => {
 	const store = createStore(
-		combineReducers({
-			auth: authReducer,
-			rooms: roomsReducer,
-		}),
+		reducers,
 		composeEnhancers(applyMiddleware(thunk, sagaMiddleware)),
-  )
-  
-  sagaMiddleware.run(mySaga)
+	)
+
+	sagaMiddleware.run(mySaga)
 
 	return store
 }

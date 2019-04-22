@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { Layout, Menu, Button, Typography } from 'antd'
 import RoomContainer from './RoomContainer'
 import CreateChatDialog from './CreateChatDialog'
+import LoadingSpinner from './LoadingSpinner'
 import { tryLogin } from '../actions/auth'
 import { initSlacker } from '../actions/rooms'
 import '../styles/index.css'
@@ -30,21 +31,21 @@ const MenuLabel = styled.button`
 `
 
 interface Props {
-	tryLogin: () => void;
-	initSlacker: () => void;
-	auth: Auth;
+	tryLogin: () => void
+	initSlacker: () => void
+	auth: Auth
 	rooms: {
-		joined: RoomItem[],
-		available: RoomItem[],
+		joined: RoomItem[]
+		available: RoomItem[]
 	}
-	history: any;
+	history: any
 	location: {
-		pathname: any,
-	};
+		pathname: any
+	}
 }
 
 interface State {
-	isCreateRoomDialogOpen: boolean;
+	isCreateRoomDialogOpen: boolean
 }
 
 class App extends Component<Props> {
@@ -59,6 +60,18 @@ class App extends Component<Props> {
 	componentWillUpdate(nextProps: Props) {
 		if (!this.props.auth.uid && nextProps.auth.uid) {
 			this.props.initSlacker()
+		}
+	}
+
+	componentDidUpdate(prevProps: Props) {
+		const { location, rooms, history } = this.props
+		if (
+			location.pathname === '/' &&
+			prevProps.rooms.joined.length === 0 &&
+			rooms.joined.length !== 0
+		) {
+			console.log('redirect to first room?')
+			history.push(`/r/${rooms.joined[0].id}`)
 		}
 	}
 
@@ -122,7 +135,11 @@ class App extends Component<Props> {
 					<Switch>
 						<Route path={'/r/:roomId'} component={RoomContainer} />
 						<Route path={'/'}>
-							<div>No chat selected</div>
+							{this.props.rooms.joined.length === 0 ? (
+								<LoadingSpinner />
+							) : (
+								<div>No chat selected</div>
+							)}
 						</Route>
 					</Switch>
 				</Layout>
