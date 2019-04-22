@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { Layout, Typography } from 'antd'
 
 import LoadingSpinner from './LoadingSpinner'
+import Message from './Message'
 import { trySendMessage } from '../actions/rooms'
 
 const { Header, Content } = Layout
@@ -23,16 +24,11 @@ const Messages = styled.div`
 	overflow-x: hidden;
 `
 
-const Message = styled.div`
-	display: flex;
-	min-height: 40px;
-	border-bottom: 1px solid grey;
-`
-
 const InputForm = styled.form`
-	height: 50px;
+	height: 44px;
 	background-color: #fff;
 	border-radius: 4px;
+	border: 1px solid #acacac;
 	display: flex;
 	flex-direction: row;
 	flex-shrink: 0;
@@ -48,14 +44,17 @@ const Input = styled.input`
 
 const SendButton = styled.button`
 	flex-shrink: 0;
+	padding: 0px 15px;
+	background: none;
+	border: none;
 `
 
 interface Props {
-	auth: Auth;
-	room: RoomItem | { id: null, name: string, messages: any[] };
-	isLoading: boolean;
-	messages: any[];
-	trySendMessage: (text: string, roomId: string, status?: boolean) => void;
+	auth: Auth
+	room: RoomItem | { id: null; name: string; messages: any[] }
+	isLoading: boolean
+	messages: any[]
+	trySendMessage: (text: string, roomId: string, status?: boolean) => void
 }
 
 class RoomContainer extends Component<Props> {
@@ -108,8 +107,8 @@ class RoomContainer extends Component<Props> {
 	handleSend = (e: any) => {
 		e.preventDefault()
 		const { room } = this.props
-		if (!!room.id) {
-			const text = this.state.messageValue
+		const text = this.state.messageValue
+		if (!!room.id && text.length > 0) {
 			this.props.trySendMessage(text, room.id)
 			this.setState({
 				messageValue: '',
@@ -120,15 +119,15 @@ class RoomContainer extends Component<Props> {
 	render() {
 		const { room, messages, isLoading } = this.props
 		// console.log(messages)
-		let content = (
-			<LoadingSpinner />
-		)
+		let content = <LoadingSpinner />
 		if (!isLoading) {
 			content = (
 				<ChatWrapper>
 					<Messages>
 						{messages.map(message => (
-							<Message key={message.id}>{message.text}</Message>
+							<Message name={message.sender.displayName} key={message.id}>
+								{message.text}
+							</Message>
 						))}
 						<div
 							style={{ float: 'left', clear: 'both' }}
@@ -152,9 +151,10 @@ class RoomContainer extends Component<Props> {
 				<Header
 					style={{
 						background: '#fff',
+						borderBottom: '1px solid #acacac',
 						padding: 16,
 						display: 'flex',
-						flexRirection: 'row',
+						flexDirection: 'row',
 						alignItems: 'center',
 					}}
 				>

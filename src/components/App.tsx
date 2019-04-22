@@ -131,7 +131,7 @@ class App extends Component<Props> {
 						))}
 					</Menu>
 				</Sider>
-				<Layout style={{ marginLeft: 200 }}>
+				<Layout style={{ marginLeft: 200, background: '#fff' }}>
 					<Switch>
 						<Route path={'/r/:roomId'} component={RoomContainer} />
 						<Route path={'/'}>
