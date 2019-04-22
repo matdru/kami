@@ -40,6 +40,7 @@ const Input = styled.input`
 	border: none;
 	border-radius: 4px;
 	flex-grow: 1;
+	outline: none;
 `
 
 const SendButton = styled.button`
@@ -53,7 +54,7 @@ interface Props {
 	auth: Auth
 	room: RoomItem | { id: null; name: string; messages: any[] }
 	isLoading: boolean
-	messages: any[]
+	messages: Message[]
 	trySendMessage: (text: string, roomId: string, status?: boolean) => void
 }
 
@@ -141,8 +142,15 @@ class RoomContainer extends Component<Props> {
 							this.messagesContainer = el
 						}}
 					>
-						{messages.map(message => (
-							<Message name={message.sender.displayName} key={message.id}>
+						{messages.map((message, idx) => (
+							<Message
+								isConsecutive={
+									!!messages[idx - 1] &&
+									messages[idx - 1].sender.uid === message.sender.uid
+								}
+								name={message.sender.displayName || ''}
+								key={message.id}
+							>
 								{message.text}
 							</Message>
 						))}

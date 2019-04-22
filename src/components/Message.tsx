@@ -4,10 +4,13 @@ import styled from 'styled-components'
 const MessageLayout = styled.div`
 	display: flex;
 	flex-direction: row;
-	min-height: 40px;
+	margin-bottom: 2px;
 `
 
-const LeftPanel = styled.div``
+const LeftPanel = styled.div`
+	width: 45px;
+`
+
 const Avatar = styled.div`
 	width: 35px;
 	height: 35px;
@@ -16,7 +19,9 @@ const Avatar = styled.div`
 	background-color: #cecece;
 `
 
-const RightPanel = styled.div``
+const RightPanel = styled.div`
+	color: black;
+`
 
 const MessageHeader = styled.div`
 	color: black;
@@ -26,18 +31,34 @@ const MessageHeader = styled.div`
 
 interface Props {
 	name: string
+	isConsecutive?: boolean
 }
 
-const Message: FunctionComponent<Props> = ({ children, name }) => (
-	<MessageLayout>
-		<LeftPanel>
-			<Avatar />
-		</LeftPanel>
-		<RightPanel>
-			<MessageHeader>{name}</MessageHeader>
-			{children}
-		</RightPanel>
-	</MessageLayout>
-)
+const Message: FunctionComponent<Props> = ({
+	children,
+	name,
+	isConsecutive,
+}) => {
+	if (isConsecutive) {
+		return (
+			<MessageLayout>
+				<LeftPanel />
+				<RightPanel>{children}</RightPanel>
+			</MessageLayout>
+		)
+	}
+
+	return (
+		<MessageLayout>
+			<LeftPanel>
+				<Avatar />
+			</LeftPanel>
+			<RightPanel>
+				<MessageHeader>{name}</MessageHeader>
+				{children}
+			</RightPanel>
+		</MessageLayout>
+	)
+}
 
 export default Message
