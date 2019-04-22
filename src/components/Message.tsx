@@ -1,4 +1,5 @@
 import React, { FunctionComponent } from 'react'
+import { Avatar } from 'antd'
 import styled from 'styled-components'
 
 const MessageLayout = styled.div`
@@ -8,16 +9,17 @@ const MessageLayout = styled.div`
 `
 
 const LeftPanel = styled.div`
-	width: 45px;
+	width: 46px;
+	padding: 5px;
 `
 
-const Avatar = styled.div`
-	width: 35px;
-	height: 35px;
-	margin: 5px;
-	border-radius: 2px;
-	background-color: #cecece;
-`
+// const Avatar = styled.div`
+// 	/* width: 35px;
+// 	height: 35px;
+// 	margin: 5px;
+// 	border-radius: 2px;
+// 	background-color: #cecece;
+// ` */
 
 const RightPanel = styled.div`
 	color: black;
@@ -51,7 +53,7 @@ const Message: FunctionComponent<Props> = ({
 	return (
 		<MessageLayout>
 			<LeftPanel>
-				<Avatar />
+				<Avatar size={35} shape="square" icon="user" />
 			</LeftPanel>
 			<RightPanel>
 				<MessageHeader>{name}</MessageHeader>

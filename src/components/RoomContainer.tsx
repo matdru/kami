@@ -53,6 +53,7 @@ const SendButton = styled.button`
 interface Props {
 	auth: Auth
 	room: RoomItem | { id: null; name: string; messages: any[] }
+	match: any
 	isLoading: boolean
 	messages: Message[]
 	trySendMessage: (text: string, roomId: string, status?: boolean) => void
@@ -66,6 +67,11 @@ class RoomContainer extends Component<Props> {
 	messagesEnd: any = null
 	messagesContainer: HTMLElement | null = null
 
+	componentWillMount() {
+		const { roomId } = this.props.match.params
+		console.log(roomId)
+	}
+
 	componentDidMount() {
 		this.scrollToBottom()
 	}
@@ -76,6 +82,7 @@ class RoomContainer extends Component<Props> {
 			return
 		}
 
+		// scroll management
 		if (
 			prevProps.messages.length !== this.props.messages.length &&
 			prevProps.messages.length > 0 &&
