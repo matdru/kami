@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
-import { Layout, Menu, Button, Typography } from 'antd'
+import { Layout, Menu, Button, Icon } from 'antd'
 import RoomContainer from './RoomContainer'
 import CreateChatDialog from './CreateChatDialog'
 import LoadingSpinner from './LoadingSpinner'
@@ -18,12 +18,16 @@ const ButtonWrap = styled.div`
 	padding: 15px;
 `
 
-const MenuLabel = styled.button`
-	padding-left: 10px;
+const RoomButtons = styled.div`
+	padding: 10px;
 	color: rgba(255, 255, 255, 0.65);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	background: none;
 	border: none;
-	transition: color 1s;
+	-webkit-transition: color .5s;
+	transition: color .5s;
 	cursor: pointer;
 	&:hover {
 		color: #fff;
@@ -115,9 +119,10 @@ class App extends Component<Props> {
 						isOpen={this.state.isCreateRoomDialogOpen}
 						handleClose={this.handleCloseCreateChatDialog}
 					/>
-					<MenuLabel>
+					<RoomButtons>
 						<span>Rooms:</span>
-					</MenuLabel>
+						<Icon type="plus-circle" />
+					</RoomButtons>
 					<Menu
 						theme="dark"
 						mode="inline"

@@ -19,6 +19,8 @@ const ChatWrapper = styled.div`
 `
 
 const Messages = styled.div`
+	padding-top: 8px;
+	padding-bottom: 8px;
 	flex-grow: 1;
 	overflow-y: scroll;
 	overflow-x: hidden;
@@ -32,7 +34,6 @@ const InputForm = styled.form`
 	display: flex;
 	flex-direction: row;
 	flex-shrink: 0;
-	margin-top: 10px;
 `
 
 const Input = styled.input`
@@ -196,7 +197,7 @@ class RoomContainer extends Component<Props> {
 				</Header>
 				<Content
 					style={{
-						margin: '24px 16px',
+						margin: '0px 16px 24px 26px',
 						overflow: 'initial',
 					}}
 				>
