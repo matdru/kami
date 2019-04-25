@@ -1,14 +1,14 @@
 {
   "main.css": "/slacker/static/css/main.65f34b2b.chunk.css",
-  "main.js": "/slacker/static/js/main.845c058b.chunk.js",
-  "main.js.map": "/slacker/static/js/main.845c058b.chunk.js.map",
+  "main.js": "/slacker/static/js/main.5ece5b96.chunk.js",
+  "main.js.map": "/slacker/static/js/main.5ece5b96.chunk.js.map",
   "runtime~main.js": "/slacker/static/js/runtime~main.86673fd6.js",
   "runtime~main.js.map": "/slacker/static/js/runtime~main.86673fd6.js.map",
   "static/css/2.168cdb51.chunk.css": "/slacker/static/css/2.168cdb51.chunk.css",
   "static/js/2.93523e0d.chunk.js": "/slacker/static/js/2.93523e0d.chunk.js",
   "static/js/2.93523e0d.chunk.js.map": "/slacker/static/js/2.93523e0d.chunk.js.map",
   "index.html": "/slacker/index.html",
-  "precache-manifest.7199bb8963b1d90d98ca71af0ad9299a.js": "/slacker/precache-manifest.7199bb8963b1d90d98ca71af0ad9299a.js",
+  "precache-manifest.958d70eb1a43e9441bbae22c6f7bbc97.js": "/slacker/precache-manifest.958d70eb1a43e9441bbae22c6f7bbc97.js",
   "service-worker.js": "/slacker/service-worker.js",
   "static/css/2.168cdb51.chunk.css.map": "/slacker/static/css/2.168cdb51.chunk.css.map",
   "static/css/main.65f34b2b.chunk.css.map": "/slacker/static/css/main.65f34b2b.chunk.css.map"
