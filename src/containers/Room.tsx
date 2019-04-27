@@ -3,14 +3,14 @@ import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { Layout, Typography } from 'antd'
 
-import LoadingSpinner from './LoadingSpinner'
-import Message from './Message'
-import ChatInput from './ChatInput'
+import LoadingSpinner from '../components/LoadingSpinner'
+import Message from '../components/Message'
+import ChatInput from '../components/ChatInput'
+import AppHeader from './AppHeader'
 
 import { trySendMessage } from '../actions/rooms'
 
-const { Header, Content } = Layout
-const { Title } = Typography
+const { Content } = Layout
 
 const ChatWrapper = styled.div`
 	height: 100%;
@@ -130,20 +130,7 @@ class RoomContainer extends Component<Props> {
 		}
 		return (
 			<Fragment>
-				<Header
-					style={{
-						background: '#fff',
-						borderBottom: '1px solid #acacac',
-						padding: 16,
-						display: 'flex',
-						flexDirection: 'row',
-						alignItems: 'center',
-					}}
-				>
-					<Title style={{ margin: 0 }} level={3}>
-						# {room ? room.name : ''}
-					</Title>
-				</Header>
+				<AppHeader room={room} />
 				<Content
 					style={{
 						margin: '0px 16px 24px 16px',

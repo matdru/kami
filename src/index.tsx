@@ -4,7 +4,7 @@ import { HashRouter as Router, Route } from 'react-router-dom'
 import ReactDOM from 'react-dom'
 import 'antd/dist/antd.css'
 
-import App from './components/App'
+import App from './containers/App'
 import configureStore from './store/configureStore'
 
 const store = configureStore()
