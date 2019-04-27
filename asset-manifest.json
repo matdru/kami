@@ -1,15 +1,15 @@
 {
-  "main.css": "/kami/static/css/main.8845288b.chunk.css",
-  "main.js": "/kami/static/js/main.03acaec0.chunk.js",
-  "main.js.map": "/kami/static/js/main.03acaec0.chunk.js.map",
+  "main.css": "/kami/static/css/main.09200072.chunk.css",
+  "main.js": "/kami/static/js/main.9210c0d6.chunk.js",
+  "main.js.map": "/kami/static/js/main.9210c0d6.chunk.js.map",
   "runtime~main.js": "/kami/static/js/runtime~main.7a4d96be.js",
   "runtime~main.js.map": "/kami/static/js/runtime~main.7a4d96be.js.map",
-  "static/css/2.0031b977.chunk.css": "/kami/static/css/2.0031b977.chunk.css",
+  "static/css/2.82d939bc.chunk.css": "/kami/static/css/2.82d939bc.chunk.css",
   "static/js/2.09b8e857.chunk.js": "/kami/static/js/2.09b8e857.chunk.js",
   "static/js/2.09b8e857.chunk.js.map": "/kami/static/js/2.09b8e857.chunk.js.map",
   "index.html": "/kami/index.html",
-  "precache-manifest.0a59579cc883c809faff432de75115fc.js": "/kami/precache-manifest.0a59579cc883c809faff432de75115fc.js",
+  "precache-manifest.a072a59ae00953c092d9338bcac6e1fa.js": "/kami/precache-manifest.a072a59ae00953c092d9338bcac6e1fa.js",
   "service-worker.js": "/kami/service-worker.js",
-  "static/css/2.0031b977.chunk.css.map": "/kami/static/css/2.0031b977.chunk.css.map",
-  "static/css/main.8845288b.chunk.css.map": "/kami/static/css/main.8845288b.chunk.css.map"
+  "static/css/2.82d939bc.chunk.css.map": "/kami/static/css/2.82d939bc.chunk.css.map",
+  "static/css/main.09200072.chunk.css.map": "/kami/static/css/main.09200072.chunk.css.map"
 }
