@@ -1,20 +1,22 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
-import { Modal, Input, Typography, Row, Col } from 'antd'
-import { tryCreateRoom, RoomData } from '../actions/rooms'
+import { Modal, Input, Typography, Row, Col, Icon, Button } from 'antd'
+import { tryLoginProvider } from '../actions/auth'
 const { TextArea } = Input
 const { Text, Title } = Typography
 
-const TextWrap = styled.div`
-	margin-top: 5px;
-	margin-bottom: 5px;
+const LoginProviders = styled.div`
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
 `
 
 interface Props {
 	isOpen: boolean
 	handleClose: () => void
-	tryCreateRoom: (roomData: RoomData, showCreateError?: any) => Promise<any>
+	tryLoginProvider: () => Promise<any>
 	auth: Auth
 }
 
@@ -24,6 +26,11 @@ interface State {
 }
 
 class ProfileDialog extends Component<Props, State> {
+	handleTryLogin = () => {
+		this.props.tryLoginProvider().then(() => {
+			this.props.handleClose()
+		})
+	}
 	render() {
 		return (
 			<Modal
@@ -35,11 +42,18 @@ class ProfileDialog extends Component<Props, State> {
 				cancelButtonProps={{ disabled: !this.props.auth.uid }}
 			>
 				<div>
-					Some user stuff here
-					<Title level={3}>Login with</Title>
+					<Title level={4}>Login with</Title>
 					<Row>
-						<Col span={12}>github</Col>
-						<Col span={12}>google</Col>
+						<Col span={24}>
+							<LoginProviders>
+								<Button onClick={this.handleTryLogin} style={{ margin: 5 }}>
+									<Icon style={{ fontSize: 24 }} type="github" />
+								</Button>
+								<Button>
+									<Icon style={{ fontSize: 24 }} type="google" />
+								</Button>
+							</LoginProviders>
+						</Col>
 					</Row>
 				</div>
 			</Modal>
@@ -53,5 +67,5 @@ const mapStateToProps = (state: any) => ({
 
 export default connect(
 	mapStateToProps,
-	{ tryCreateRoom },
+	{ tryLoginProvider },
 )(ProfileDialog)
