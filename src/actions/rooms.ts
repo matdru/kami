@@ -1,19 +1,17 @@
 import database, { firebase } from '../firebase/firebase'
-// import { history } from "../routers/AppRouter";
 import moment from 'moment'
 import * as path from 'path'
 // import { ipcRenderer } from 'electron';
 
 const byCreatedAt = function(a: any, b: any) {
-	// @ts-ignore
-	return new Date(a.createdAt) - new Date(b.createdAt)
+	return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
 }
 
 export interface RoomData {
-	id?: string;
-	name: string;
-	people: any;
-	messages?: any;
+	id?: string
+	name: string
+	people: any
+	messages?: any
 }
 
 export const createRoom = ({ id, name, people, messages = [] }: RoomData) => ({
@@ -28,7 +26,7 @@ export const createRoom = ({ id, name, people, messages = [] }: RoomData) => ({
 
 export const joinedRoom = (joinedRoom: RoomItem) => ({
 	type: 'JOINED_ROOM',
-	joinedRoom
+	joinedRoom,
 })
 
 export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {
@@ -99,87 +97,6 @@ export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {
 	}
 }
 
-export const startListening = (roomId: string) => {
-	return (dispatch: any, getState: () => StoreState) => {
-		return database
-			.collection(`rooms/${roomId}/messages`)
-			.onSnapshot(messagesQuery => {
-				if (getState().rooms.joined.find(room => room.id === roomId)) {
-					database
-						.collection(`rooms/${roomId}/people`)
-						.get()
-						.then(personQuery => {
-							const messages: any[] = []
-							messagesQuery.forEach(doc => {
-								messages.push({ id: doc.id, ...doc.data() })
-							})
-							console.log('listener -> ', { messages })
-							messages.sort(byCreatedAt)
-							return dispatch(updateMessages(messages, roomId))
-							
-							// dispatch(
-							// 	sendMessage(
-							// 		{
-							// 			...message,
-							// 			id: msgSnapshot ? msgSnapshot.key : 'nullSnap',
-							// 		},
-							// 		roomName,
-							// 	),
-							// )
-							// dispatch(orderRoomsStartState())
-							// if (message.sender.displayName !== getState().auth.displayName) {
-							// 	// ipcRenderer.send('playNotif', message.sender.displayName, message.text);
-							// 	const audio = new Audio('/sounds/notif.mp3')
-							// 	audio.play()
-							// }
-							// const keyword =
-							// 	message.status && message.text.split(' ').splice(-1, 1)[0]
-							// if (keyword === 'left') {
-							// 	dispatch(onLeft(roomName, message.sender.uid))
-							// } else if (keyword === 'joined') {
-							// 	dispatch(
-							// 		onJoined(roomName, personSnapshot.val()[message.sender.uid]),
-							// 	)
-							// }
-							// const personID = getState().auth.uid
-
-							// if (personID === message.sender.uid && keyword !== 'left') {
-							// 	database
-							// 		.ref(`rooms/${roomName}/people/${personID}`)
-							// 		.update({ unread: 0, lastRead: message.createdAt })
-							// 		.then(() => {
-							// 			dispatch(
-							// 				setUnread(roomName, personID, message.createdAt, 0),
-							// 			)
-							// 		})
-							// } else if (
-							// 	personID !== message.sender.uid &&
-							// 	moment(message.createdAt) >
-							// 		moment(personSnapshot.val()[personID].lastRead)
-							// ) {
-							// 	database
-							// 		.ref(`rooms/${roomName}/people/${personID}`)
-							// 		.update({
-							// 			unread: personSnapshot.val()[personID].unread + 1,
-							// 			lastRead: message.createdAt,
-							// 		})
-							// 		.then(() => {
-							// 			dispatch(
-							// 				setUnread(
-							// 					roomName,
-							// 					personID,
-							// 					message.createdAt,
-							// 					personSnapshot.val()[personID].unread + 1,
-							// 				),
-							// 			)
-							// 		})
-							// }
-						})
-				}
-			})
-	}
-}
-
 const isAlreadyAdded = (data: any, id: string) => {
 	for (var key in data) {
 		if (data[key].id === id) return true
@@ -188,8 +105,8 @@ const isAlreadyAdded = (data: any, id: string) => {
 }
 
 export const showError = (message: string) => ({
-		type: 'ERROR_MESSAGE',
-		message
+	type: 'ERROR_MESSAGE',
+	message,
 })
 
 export const sendMessage = (message: any, roomName: string) => ({
@@ -231,11 +148,11 @@ export const orderRoomsStartState = () => ({
 
 export const availableRooms = (rooms: RoomItem[]) => ({
 	type: 'AVAILABLE_ROOMS',
-	rooms
+	rooms,
 })
 
 export const initSlacker = () => ({
-	type: 'INIT_SLACKER_SAGA'
+	type: 'INIT_SLACKER_SAGA',
 })
 
 export const clearState = {
@@ -318,7 +235,6 @@ export const onJoined = (roomName: string, person: any) => ({
 	roomName,
 	person,
 })
-
 
 export const syncMessages = (messagesSnapshot: any, roomId: string) => {
 	const messages: any[] = []

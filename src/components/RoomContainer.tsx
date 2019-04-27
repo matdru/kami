@@ -5,6 +5,8 @@ import { Layout, Typography } from 'antd'
 
 import LoadingSpinner from './LoadingSpinner'
 import Message from './Message'
+import ChatInput from './ChatInput'
+
 import { trySendMessage } from '../actions/rooms'
 
 const { Header, Content } = Layout
@@ -26,34 +28,9 @@ const Messages = styled.div`
 	overflow-x: hidden;
 `
 
-const InputForm = styled.form`
-	height: 44px;
-	background-color: #fff;
-	border-radius: 4px;
-	border: 1px solid #acacac;
-	display: flex;
-	flex-direction: row;
-	flex-shrink: 0;
-`
-
-const Input = styled.input`
-	padding-left: 14px;
-	border: none;
-	border-radius: 4px;
-	flex-grow: 1;
-	outline: none;
-`
-
-const SendButton = styled.button`
-	flex-shrink: 0;
-	padding: 0px 15px;
-	background: none;
-	border: none;
-`
-
 interface Props {
 	auth: Auth
-	room: RoomItem | { id: null; name: string; messages: any[] }
+	room: RoomItem | undefined
 	match: any
 	isLoading: boolean
 	messages: Message[]
@@ -61,10 +38,6 @@ interface Props {
 }
 
 class RoomContainer extends Component<Props> {
-	state = {
-		messageValue: '',
-	}
-
 	messagesEnd: any = null
 	messagesContainer: HTMLElement | null = null
 
@@ -115,32 +88,14 @@ class RoomContainer extends Component<Props> {
 			}
 		}
 	}
-
-	handleTyping = (e: any) => {
-		this.setState({ messageValue: e.target.value })
-	}
-
 	scrollToBottom = () => {
 		if (this.messagesEnd) {
 			this.messagesEnd.scrollIntoView({ behavior: 'auto' })
 		}
 	}
 
-	handleSend = (e: any) => {
-		e.preventDefault()
-		const { room } = this.props
-		const text = this.state.messageValue
-		if (!!room.id && text.length > 0) {
-			this.props.trySendMessage(text, room.id)
-			this.setState({
-				messageValue: '',
-			})
-		}
-	}
-
 	render() {
 		const { room, messages, isLoading } = this.props
-		// console.log(messages)
 		let content = <LoadingSpinner />
 		if (!isLoading) {
 			content = (
@@ -169,13 +124,7 @@ class RoomContainer extends Component<Props> {
 							}}
 						/>
 					</Messages>
-					<InputForm onSubmit={this.handleSend}>
-						<Input
-							value={this.state.messageValue}
-							onChange={this.handleTyping}
-						/>
-						<SendButton type={'submit'}>Send</SendButton>
-					</InputForm>
+					<ChatInput room={this.props.room} />
 				</ChatWrapper>
 			)
 		}
@@ -192,7 +141,7 @@ class RoomContainer extends Component<Props> {
 					}}
 				>
 					<Title style={{ margin: 0 }} level={3}>
-						# {room.name}
+						# {room ? room.name : ''}
 					</Title>
 				</Header>
 				<Content
@@ -214,7 +163,7 @@ const mapStateToProps = (state: StoreState, ownProps: any) => {
 	const messages = room ? room.messages : []
 	return {
 		auth: state.auth,
-		room: room || { id: null, name: '', messages: [] },
+		room,
 		messages,
 		isLoading: !room,
 	}
