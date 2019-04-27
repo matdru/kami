@@ -146,7 +146,7 @@ class RoomContainer extends Component<Props> {
 				</Header>
 				<Content
 					style={{
-						margin: '0px 16px 24px 26px',
+						margin: '0px 16px 24px 16px',
 						overflow: 'initial',
 					}}
 				>

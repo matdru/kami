@@ -122,13 +122,6 @@ class App extends Component<Props, State> {
 				>
 					<LogoWrap>
 						<Logo src="fox.png" />
-						{/* <Button
-							icon="plus"
-							type="primary"
-							onClick={() => this.handleOpenDialog('createRoom')}
-						>
-							Create room
-						</Button> */}
 					</LogoWrap>
 
 					<RoomButtons>
@@ -151,7 +144,7 @@ class App extends Component<Props, State> {
 						theme="dark"
 						mode="inline"
 						onSelect={this.handleRoomSelect}
-						defaultSelectedKeys={[this.props.location.pathname]}
+						selectedKeys={[this.props.location.pathname]}
 					>
 						{this.props.rooms.joined.map(room => (
 							<Menu.Item key={`/r/${room.id}`}>
