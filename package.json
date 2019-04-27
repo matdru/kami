@@ -23,10 +23,10 @@
     "styled-components": "^4.2.0",
     "typescript": "^3.4.3"
   },
-  "name": "slacker",
+  "name": "kami",
   "description": "playground firebase chat app",
   "version": "0.0.0",
-  "homepage": "https://matdru.github.io/slacker",
+  "homepage": "https://matdru.github.io/kami",
   "devDependencies": {
     "react-scripts": "^2.1.8"
   },
