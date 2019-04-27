@@ -1,6 +1,5 @@
 import database, { firebase } from '../firebase/firebase'
 import moment from 'moment'
-import * as path from 'path'
 // import { ipcRenderer } from 'electron';
 
 const byCreatedAt = function(a: any, b: any) {
@@ -27,6 +26,11 @@ export const createRoom = ({ id, name, people, messages = [] }: RoomData) => ({
 export const joinedRoom = (joinedRoom: RoomItem) => ({
 	type: 'JOINED_ROOM',
 	joinedRoom,
+})
+
+export const tryJoinRoom = (roomId: string) => ({
+	type: 'JOIN_ROOM_SAGA',
+	roomId
 })
 
 export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {

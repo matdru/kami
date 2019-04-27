@@ -3,16 +3,12 @@ import styled from 'styled-components'
 import { connect } from 'react-redux'
 import {
 	Modal,
-	Input,
-	Typography,
 	List,
-	message,
 	Avatar,
-	Spin,
 	Button,
 } from 'antd'
 
-import { tryCreateRoom, RoomData } from '../actions/rooms'
+import { tryJoinRoom } from '../actions/rooms'
 
 const Label = styled.div`
 	padding: 10px;
@@ -25,7 +21,7 @@ interface RoomWithAvailability extends RoomItem {
 interface Props {
 	isOpen: boolean
 	handleClose: () => void
-	tryCreateRoom: (roomData: RoomData, showCreateError?: any) => Promise<any>
+	tryJoinRoom: (roomId: string) => void
 	auth: Auth
 	roomList: Array<RoomWithAvailability>
 }
@@ -43,7 +39,8 @@ class BrowseRoomsDialog extends Component<Props, State> {
 			return
 		}
 
-		this.props.handleClose()
+		this.props.tryJoinRoom(room.id)
+		// this.props.handleClose()
 	}
 
 	render() {
@@ -104,5 +101,5 @@ const mapStateToProps = (state: StoreState) => {
 
 export default connect(
 	mapStateToProps,
-	{ tryCreateRoom },
+	{ tryJoinRoom },
 )(BrowseRoomsDialog)
