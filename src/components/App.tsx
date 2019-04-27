@@ -1,21 +1,31 @@
 import React, { Component } from 'react'
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
-import { Layout, Menu, Button, Icon } from 'antd'
+import { Layout, Menu, Icon } from 'antd'
+
 import RoomContainer from './RoomContainer'
 import CreateChatDialog from './CreateChatDialog'
+import BrowseRoomsDialog from './BrowseRoomsDialog'
 import LoadingSpinner from './LoadingSpinner'
+
 import { tryLogin } from '../actions/auth'
 import { initSlacker } from '../actions/rooms'
+
 import '../styles/index.css'
 
 const { Sider } = Layout
 // const { Text } = Typography
 
-const ButtonWrap = styled.div`
+const LogoWrap = styled.div`
 	text-align: center;
-	padding: 15px;
+	padding: 10px;
+	height: 64px;
+	border-bottom: 1px solid grey;
+`
+
+const Logo = styled.img`
+	height: 100%;
 `
 
 const RoomButtons = styled.div`
@@ -24,10 +34,14 @@ const RoomButtons = styled.div`
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+`
+
+const MenuButton = styled.button`
+	font-size: 16px;
 	background: none;
 	border: none;
-	-webkit-transition: color .5s;
-	transition: color .5s;
+	-webkit-transition: color 0.5s;
+	transition: color 0.5s;
 	cursor: pointer;
 	&:hover {
 		color: #fff;
@@ -49,12 +63,12 @@ interface Props {
 }
 
 interface State {
-	isCreateRoomDialogOpen: boolean
+	openDialog: string | false
 }
 
-class App extends Component<Props> {
-	state = {
-		isCreateRoomDialogOpen: false,
+class App extends Component<Props, State> {
+	state: State = {
+		openDialog: false,
 	}
 
 	componentDidMount() {
@@ -79,15 +93,15 @@ class App extends Component<Props> {
 		}
 	}
 
-	handleCloseCreateChatDialog = () => {
+	handleCloseDialog = () => {
 		this.setState({
-			isCreateRoomDialogOpen: false,
+			openDialog: false,
 		})
 	}
 
-	handleOpenCreateChatDialog = () => {
+	handleOpenDialog = (dialogName: string) => {
 		this.setState({
-			isCreateRoomDialogOpen: true,
+			openDialog: dialogName,
 		})
 	}
 
@@ -106,23 +120,33 @@ class App extends Component<Props> {
 						left: 0,
 					}}
 				>
-					<ButtonWrap>
-						<Button
+					<LogoWrap>
+						<Logo src="fox.png" />
+						{/* <Button
 							icon="plus"
 							type="primary"
-							onClick={this.handleOpenCreateChatDialog}
+							onClick={() => this.handleOpenDialog('createRoom')}
 						>
 							Create room
-						</Button>
-					</ButtonWrap>
-					<CreateChatDialog
-						isOpen={this.state.isCreateRoomDialogOpen}
-						handleClose={this.handleCloseCreateChatDialog}
-					/>
+						</Button> */}
+					</LogoWrap>
+
 					<RoomButtons>
-						<span>Rooms:</span>
-						<Icon type="plus-circle" />
+						<MenuButton onClick={() => this.handleOpenDialog('browseRooms')}>
+							<span>Rooms:</span>
+						</MenuButton>
+						<MenuButton onClick={() => this.handleOpenDialog('createRoom')}>
+							<Icon type="plus-circle" />
+						</MenuButton>
 					</RoomButtons>
+					<CreateChatDialog
+						isOpen={this.state.openDialog === 'createRoom'}
+						handleClose={this.handleCloseDialog}
+					/>
+					<BrowseRoomsDialog
+						isOpen={this.state.openDialog === 'browseRooms'}
+						handleClose={this.handleCloseDialog}
+					/>
 					<Menu
 						theme="dark"
 						mode="inline"
