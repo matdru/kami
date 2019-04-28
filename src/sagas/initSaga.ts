@@ -2,6 +2,8 @@ import { put, select, takeLatest, fork, call } from 'redux-saga/effects'
 import database, { firebase, rsf } from '../firebase/firebase'
 import { availableRooms, createRoom, syncMessages } from '../actions/rooms'
 
+import { Query, CollectionReference } from '@firebase/firestore-types'
+
 const byCreatedAt = function(a: any, b: any) {
 	// @ts-ignore
 	return new Date(a.createdAt) - new Date(b.createdAt)
@@ -17,7 +19,7 @@ export function* fetchRoomSaga(roomId: string) {
 	if (roomDoc.exists) {
 		const room = roomDoc.data()
 		const people: any[] = []
-		const messages: any[] = []
+		const messages: any = {}
 
 		// get room's people
 		const peopleQuery = yield call(
@@ -29,19 +31,17 @@ export function* fetchRoomSaga(roomId: string) {
 		})
 		console.log({ people })
 
-		// get room's people
-		const messagesQuery = yield call(
-			rsf.firestore.getCollection,
-			roomRef.collection('messages'),
-		)
+		// get room's messages first page
+		const messagePage = <CollectionReference>roomRef
+			.collection('messages')
+			.orderBy('createdAt', 'desc')
+			.limit(25)
+		const messagesQuery = yield call(rsf.firestore.getCollection, messagePage)
+
 		messagesQuery.forEach((messageDoc: any) => {
-			messages.push({
-				id: messageDoc.id,
-				...messageDoc.data(),
-			})
+			messages[messageDoc.id] = { id: messageDoc.id, ...messageDoc.data() }
 		})
-		messages.sort(byCreatedAt)
-		console.log({ messages })
+		// messages.sort(byCreatedAt)
 
 		yield put(
 			createRoom({
@@ -53,13 +53,19 @@ export function* fetchRoomSaga(roomId: string) {
 		)
 
 		// subscribe to messages
-		yield fork(rsf.firestore.syncCollection, roomRef.collection('messages'), {
+		const newestMessage = <CollectionReference>roomRef
+			.collection('messages')
+			.orderBy('createdAt', 'desc')
+			.limit(1)
+
+		// TODO merge this with other messages to save on reads
+		yield fork(rsf.firestore.syncCollection, newestMessage, {
 			successActionCreator: (snapshot: any) => syncMessages(snapshot, roomId),
 		})
 	}
 }
 
-// worker Saga: will be fired on USER_FETCH_REQUESTED actions
+// worker Saga
 function* initSlackerSaga(action: any) {
 	const auth = yield select(state => state.auth)
 
@@ -103,7 +109,7 @@ function* initSlackerSaga(action: any) {
 		}
 
 		// if no general room, join that as well
-		if(generalRoom && !userRoomIds.includes(generalRoom.id)) {
+		if (generalRoom && !userRoomIds.includes(generalRoom.id)) {
 			yield put({
 				type: 'JOIN_ROOM_SAGA',
 				roomId: generalRoom.id,

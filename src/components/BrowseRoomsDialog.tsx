@@ -1,12 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
-import {
-	Modal,
-	List,
-	Avatar,
-	Button,
-} from 'antd'
+import { Modal, List, Avatar, Button } from 'antd'
 
 import { tryJoinRoom } from '../actions/rooms'
 
@@ -34,8 +29,8 @@ interface State {
 class BrowseRoomsDialog extends Component<Props, State> {
 	handleJoinRoom = (room: RoomWithAvailability) => {
 		if (!room.canJoin) {
-            console.log('redirect to that room')
-            this.props.handleClose()
+			console.log('redirect to that room')
+			this.props.handleClose()
 			return
 		}
 
@@ -86,8 +81,9 @@ class BrowseRoomsDialog extends Component<Props, State> {
 
 const mapStateToProps = (state: StoreState) => {
 	const { available, joined } = state.rooms
-	const roomList = available.map(room => {
-		const canJoin = joined.find(item => item.id === room.id) === undefined
+	const roomList = Object.values(available).map(room => {
+		const canJoin =
+			Object.values(joined).find(item => item.id === room.id) === undefined
 		return {
 			...room,
 			canJoin,

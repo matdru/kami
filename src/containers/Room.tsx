@@ -9,6 +9,7 @@ import ChatInput from '../components/ChatInput'
 import AppHeader from './AppHeader'
 
 import { trySendMessage } from '../actions/rooms'
+import getProps from '../selectors/room'
 
 const { Content } = Layout
 
@@ -144,18 +145,7 @@ class RoomContainer extends Component<Props> {
 	}
 }
 
-const mapStateToProps = (state: StoreState, ownProps: any) => {
-	const { roomId } = ownProps.match.params
-	const room = state.rooms.joined.find(room => room.id === roomId)
-	const messages = room ? room.messages : []
-	return {
-		auth: state.auth,
-		room,
-		messages,
-		isLoading: !room,
-	}
-}
-
+const mapStateToProps = (state: StoreState, ownProps: any) => getProps(state, ownProps)
 export default connect(
 	mapStateToProps,
 	{ trySendMessage },

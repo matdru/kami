@@ -113,11 +113,11 @@ export const showError = (message: string) => ({
 	message,
 })
 
-export const sendMessage = (message: any, roomName: string) => ({
-	type: 'SEND_MESSAGE',
-	message,
-	roomName,
-})
+// export const sendMessage = (message: any, roomId: string) => ({
+// 	type: 'SEND_MESSAGE',
+// 	message,
+// 	roomId,
+// })
 
 export const updateMessages = (messages: any, roomId: string) => ({
 	type: 'UPDATE_MESSAGES',

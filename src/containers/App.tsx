@@ -9,7 +9,7 @@ import CreateChatDialog from '../components/CreateChatDialog'
 import BrowseRoomsDialog from '../components/BrowseRoomsDialog'
 import LoadingSpinner from '../components/LoadingSpinner'
 
-import { tryLogin } from '../actions/auth'
+import { initAuth } from '../actions/auth'
 import { initSlacker } from '../actions/rooms'
 
 import '../styles/index.css'
@@ -49,13 +49,11 @@ const MenuButton = styled.button`
 `
 
 interface Props {
-	tryLogin: () => void
+	initAuth: () => void
 	initSlacker: () => void
 	auth: Auth
-	rooms: {
-		joined: RoomItem[]
-		available: RoomItem[]
-	}
+	joinedRooms: RoomItem[]
+	availableRooms: RoomItem[]
 	history: any
 	location: {
 		pathname: any
@@ -72,7 +70,7 @@ class App extends Component<Props, State> {
 	}
 
 	componentDidMount() {
-		this.props.tryLogin()
+		this.props.initAuth()
 	}
 
 	componentWillUpdate(nextProps: Props) {
@@ -82,14 +80,14 @@ class App extends Component<Props, State> {
 	}
 
 	componentDidUpdate(prevProps: Props) {
-		const { location, rooms, history } = this.props
+		const { location, joinedRooms, history } = this.props
 		if (
 			location.pathname === '/' &&
-			prevProps.rooms.joined.length === 0 &&
-			rooms.joined.length !== 0
+			prevProps.joinedRooms.length === 0 &&
+			joinedRooms.length !== 0
 		) {
 			console.log('redirect to first room?')
-			history.push(`/r/${rooms.joined[0].id}`)
+			history.push(`/r/${joinedRooms[0].id}`)
 		}
 	}
 
@@ -146,7 +144,7 @@ class App extends Component<Props, State> {
 						onSelect={this.handleRoomSelect}
 						selectedKeys={[this.props.location.pathname]}
 					>
-						{this.props.rooms.joined.map(room => (
+						{this.props.joinedRooms.map(room => (
 							<Menu.Item key={`/r/${room.id}`}>
 								<span className="nav-text"># {room.name}</span>
 							</Menu.Item>
@@ -157,7 +155,7 @@ class App extends Component<Props, State> {
 					<Switch>
 						<Route path={'/r/:roomId'} component={RoomContainer} />
 						<Route path={'/'}>
-							{this.props.rooms.joined.length === 0 ? (
+							{this.props.joinedRooms.length === 0 ? (
 								<LoadingSpinner />
 							) : (
 								<div>No chat selected</div>
@@ -172,10 +170,11 @@ class App extends Component<Props, State> {
 
 const mapStateToProps = (state: StoreState) => ({
 	auth: state.auth,
-	rooms: state.rooms,
+	joinedRooms: Object.values(state.rooms.joined),
+	availableRooms: Object.values(state.rooms.available),
 })
 
 export default connect(
 	mapStateToProps,
-	{ tryLogin, initSlacker },
+	{ initAuth, initSlacker },
 )(App)

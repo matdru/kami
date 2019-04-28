@@ -1,127 +1,79 @@
 import moment from 'moment'
-
 interface RoomsState {
-	joined: Room[];
-	available: Room[];
+	joined: {
+		[key: string]: RoomItem
+	}
+	available: {
+		[key: string]: RoomItem
+	}
 }
 
 const defaultState: RoomsState = {
-	joined: [],
-	available: [],
+	joined: {},
+	available: {},
 }
 
 export default (state: RoomsState = defaultState, action: any) => {
 	switch (action.type) {
 		case 'CREATE_ROOM':
-			return { ...state, joined: [...state.joined, action.room] }
+			return {
+				...state,
+				joined: { ...state.joined, [action.room.id]: action.room },
+			}
 		case 'JOINED_ROOM':
 			return {
 				...state,
-				joined: [...state.joined, action.room],
+				joined: { ...state.joined, [action.room.id]: action.room },
 			}
 
 		case 'AVAILABLE_ROOMS':
-			return { ...state, available: action.rooms }
-
-		// case 'ON_LEFT':
-		// 	// console.log('onleft');
-
-		// 	return state.map(room => {
-		// 		// console.log(room);
-		// 		if (room.name === action.roomName) {
-		// 			const p = room.people.filter((person: Person) => {
-		// 				return person.id !== action.personID
-		// 			})
-		// 			// console.log(p);
-		// 			return {
-		// 				...room,
-		// 				people: p,
-		// 			}
-		// 		} else {
-		// 			return room
-		// 		}
-		// 	})
-
-		// case 'ON_JOINED':
-		// 	return state.map(room => {
-		// 		if (room.name === action.roomName) {
-		// 			room.people.push(action.person)
-		// 			return room
-		// 		} else {
-		// 			return room
-		// 		}
-		// 	})
+			return {
+				...state,
+				available: {
+					...action.rooms.reduce(
+						(acc: any, value: RoomItem) => ({
+							...acc,
+							[value.id]: value,
+						}),
+						{},
+					),
+				},
+			}
 
 		case 'SEND_MESSAGE':
 			return {
 				...state,
-				joined: state.joined.map(room => {
-					if (room.name === action.roomName) {
-						return {
-							...room,
-							messages: [...room.messages, action.message],
-						}
-					} else {
-						return room
-					}
-				}),
+				joined: {
+					...state.joined,
+					[action.roomId]: {
+						...[state.joined[action.roomId]],
+						messages: {
+							...state.joined[action.roomId].messages,
+							[action.message.id]: action.message,
+						},
+					},
+				},
 			}
 		case 'UPDATE_MESSAGES':
 			return {
 				...state,
-				joined: state.joined.map(room => {
-					if (room.id === action.roomId) {
-						return {
-							...room,
-							messages: [...action.messages],
-						}
-					} else {
-						return room
-					}
-				}),
+				joined: {
+					...state.joined,
+					[action.roomId]: {
+						...state.joined[action.roomId],
+						messages: {
+							...state.joined[action.roomId].messages,
+							...action.messages.reduce(
+								(acc: any, message: Message) => ({
+									...acc,
+									[message.id]: message,
+								}),
+								{},
+							),
+						},
+					},
+				},
 			}
-		// case 'REORDER_ROOMS':
-		//   let room;
-		//   let rooms = state.filter((r) => {
-		//     if(r.name === action.roomName) {
-		//       room = r;
-		//       return false;
-		//     }
-		//     else {
-		//       return true;
-		//     }
-		//   });
-		//   rooms.unshift(room);
-		//   return rooms;
-		// case 'ORDER_ROOMS_START_STATE':
-		// 	//  const x =  action.rooms.sort((a, b) => {
-		// 	//   //  console.log('a', a);
-		// 	//   //  console.log('b', b);
-		// 	//   if(a.messages.length > 0 && b.messages.length > 0) {
-		// 	//     console.log(typeof a.messages);
-
-		// 	//     return moment(a.messages[a.messages.length-1].createdAt) > moment(b.messages[b.messages.length-1].createdAt)
-		// 	//     // {
-		// 	//   //     return -1;
-		// 	//   //   } else {
-		// 	//   //     return 1;
-		// 	//   //   }
-		// 	//   // }
-		// 	//   // else {
-		// 	//   //   return -1;
-		// 	//   }
-		// 	// });
-		// 	// console.log(typeof x)
-		// 	// console.log(x);
-		// 	// return x;
-		// 	state.sort((a: any, b: any) => {
-		// 		return moment(a.messages[a.messages.length - 1].createdAt) <
-		// 			moment(b.messages[b.messages.length - 1].createdAt)
-		// 			? 1
-		// 			: -1
-		// 	})
-		// 	// console.log(state);
-		// 	return state.map(room => room)
 
 		// case 'CLEAR_UNREAD':
 		// 	return state.map(room => {

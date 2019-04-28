@@ -42,7 +42,7 @@ interface RoomItem {
 interface StoreState {
 	auth: Auth
 	rooms: {
-		joined: RoomItem[]
-		available: RoomItem[]
+		joined: { [key: string]: RoomItem }
+		available: { [key: string]: RoomItem }
 	}
 }
