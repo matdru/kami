@@ -18,6 +18,7 @@ export const initAuth = () => {
 				}
 			} else {
 				console.log('user is undefined here lol')
+				tryLogin()(dispatch)
 
 				// which means we have to sign ppl anonymously and then they can sign in later
 
@@ -81,10 +82,8 @@ export const logout = () => ({
 
 export const tryLogout = () => {
 	return () => {
-		return auth
-			.signOut()
-			.then(() => {
-				console.log('log out!!!')
-			})
+		return auth.signOut().then(() => {
+			console.log('log out!!!')
+		})
 	}
 }
