@@ -14,7 +14,8 @@ import getProps from '../selectors/room'
 const { Content } = Layout
 
 const ChatWrapper = styled.div`
-	height: 100%;
+	/* height: 100%; */
+	width: 100%;
 	padding: 24;
 	display: flex;
 	flex-direction: column;
@@ -52,12 +53,21 @@ class RoomContainer extends Component<Props> {
 	}
 
 	componentDidUpdate(prevProps: Props) {
+		// scroll management
 		if (prevProps.messages.length === 0 && this.props.messages.length > 0) {
 			this.scrollToBottom()
 			return
 		}
 
-		// scroll management
+		if (
+			prevProps.room &&
+			this.props.room &&
+			prevProps.room.id !== this.props.room.id
+		) {
+			this.scrollToBottom()
+			return
+		}
+
 		if (
 			prevProps.messages.length !== this.props.messages.length &&
 			prevProps.messages.length > 0 &&
@@ -89,6 +99,7 @@ class RoomContainer extends Component<Props> {
 			}
 		}
 	}
+
 	scrollToBottom = () => {
 		if (this.messagesEnd) {
 			this.messagesEnd.scrollIntoView({ behavior: 'auto' })
@@ -136,6 +147,7 @@ class RoomContainer extends Component<Props> {
 					style={{
 						margin: '0px 16px 24px 16px',
 						overflow: 'initial',
+						display: 'flex'
 					}}
 				>
 					{content}
@@ -145,7 +157,8 @@ class RoomContainer extends Component<Props> {
 	}
 }
 
-const mapStateToProps = (state: StoreState, ownProps: any) => getProps(state, ownProps)
+const mapStateToProps = (state: StoreState, ownProps: any) =>
+	getProps(state, ownProps)
 export default connect(
 	mapStateToProps,
 	{ trySendMessage },

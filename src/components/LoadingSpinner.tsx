@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { Spin } from 'antd'
 
 const LoadingWrapper = styled.div`
-	height: 100%;
+	width: 100%;
 	padding: 24;
 	display: flex;
 	flex-direction: column;
