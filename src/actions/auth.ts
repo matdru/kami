@@ -10,26 +10,20 @@ export const initAuth = () => {
 	return (dispatch: any) => {
 		return auth.onAuthStateChanged(user => {
 			if (user) {
-				console.log('user from saved whatever ?', user)
-
+				// user authenticated, update redux
 				if (user) {
 					const displayName = user.displayName || 'Ninja'
 					return dispatch(loginSuccess(user.uid, displayName))
 				}
 			} else {
-				console.log('user is undefined here lol')
-				tryLogin()(dispatch)
-
-				// which means we have to sign ppl anonymously and then they can sign in later
-
-				// Implement logic to trigger the login dialog here or redirect to sign-in page.
-				// e.g. showDialog()
+				// no saved user, create shadow
+				tryLoginAnonymously()(dispatch)
 			}
 		})
 	}
 }
 
-export const tryLogin = () => {
+export const tryLoginAnonymously = () => {
 	return (dispatch: any) => {
 		return auth
 			.signInAnonymously()
