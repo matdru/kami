@@ -13,7 +13,15 @@ const firebaseApp = firebase.initializeApp(config)
 const rsf = new ReduxSagaFirebase(firebaseApp)
 const database = firebase.firestore()
 const githubAuthProvider = new firebase.auth.GithubAuthProvider()
+const googleAuthProvider = new firebase.auth.GoogleAuthProvider()
 
 const auth = firebase.auth()
 
-export { firebase, rsf, auth, githubAuthProvider, database as default }
+export {
+	firebase,
+	rsf,
+	auth,
+	githubAuthProvider,
+	googleAuthProvider,
+	database as default,
+}

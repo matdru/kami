@@ -29,6 +29,8 @@ interface Message {
 interface Auth {
 	uid?: string
 	displayName?: string
+	photoURL?: string
+	email?: string
 }
 
 interface RoomItem {

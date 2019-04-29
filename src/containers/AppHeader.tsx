@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { Layout, Typography, Avatar, Menu, Dropdown } from 'antd'
+import { Layout, Typography, Avatar, Menu, Dropdown, Icon, Button } from 'antd'
 
 import ProfileDialog from '../components/ProfileDialog'
 
@@ -22,10 +22,13 @@ const AccountButton = styled.button`
 const TopRightMenu = styled.div`
 	display: flex;
 	flex-direction: row;
+	align-items: center;
 `
 
 interface Props {
 	room?: RoomItem
+	uid?: string
+	photoURL?: string
 }
 
 interface State {
@@ -50,19 +53,19 @@ class AppHeader extends Component<Props, State> {
 	}
 
 	render() {
-		const { room } = this.props
+		const { room, uid, photoURL } = this.props
 		// TODO plan what is in here
 		const menu = (
 			<Menu>
 				<Menu.Item onClick={this.handleProfileOpen}>
 					<a>Profile</a>
 				</Menu.Item>
-				<Menu.Item>
+				{/* <Menu.Item>
 					<a>2nd menu item</a>
 				</Menu.Item>
 				<Menu.Item>
 					<a>3rd menu item</a>
-				</Menu.Item>
+				</Menu.Item> */}
 			</Menu>
 		)
 		return (
@@ -80,20 +83,32 @@ class AppHeader extends Component<Props, State> {
 				<Title style={{ margin: 0 }} level={3}>
 					# {room ? room.name : ''}
 				</Title>
-				<TopRightMenu>
-					<Dropdown overlay={menu} placement="bottomLeft">
+				{!!uid && (
+					<TopRightMenu>
+						<Button shape="circle" style={{ paddingTop: 1, marginRight: 10 }}>
+							<Icon type="setting" />
+						</Button>
+
 						<AccountButton onClick={this.handleProfileOpen}>
-							<Avatar size={35} shape="square" icon="user" />
+							<Avatar src={photoURL} size={35} shape="square" />
 						</AccountButton>
-					</Dropdown>
-					<ProfileDialog
-						isOpen={this.state.profileOpen}
-						handleClose={this.handleProfileClose}
-					/>
-				</TopRightMenu>
+						<ProfileDialog
+							isOpen={this.state.profileOpen}
+							handleClose={this.handleProfileClose}
+						/>
+					</TopRightMenu>
+				)}
 			</Header>
 		)
 	}
 }
 
-export default connect()(AppHeader)
+const mapStateToProps = (state: StoreState) => {
+	const { auth } = state
+	return {
+		uid: auth.uid,
+		photoURL: auth.photoURL,
+	}
+}
+
+export default connect(mapStateToProps)(AppHeader)

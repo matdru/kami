@@ -16,7 +16,7 @@ const LoginProviders = styled.div`
 interface Props {
 	isOpen: boolean
 	handleClose: () => void
-	tryLoginProvider: () => Promise<any>
+	tryLoginProvider: (providerName: string) => Promise<any>
 	auth: Auth
 }
 
@@ -26,8 +26,8 @@ interface State {
 }
 
 class ProfileDialog extends Component<Props, State> {
-	handleTryLogin = () => {
-		this.props.tryLoginProvider().then(() => {
+	handleTryLogin = (providerName: string) => {
+		this.props.tryLoginProvider(providerName).then(() => {
 			this.props.handleClose()
 		})
 	}
@@ -46,10 +46,13 @@ class ProfileDialog extends Component<Props, State> {
 					<Row>
 						<Col span={24}>
 							<LoginProviders>
-								<Button onClick={this.handleTryLogin} style={{ margin: 5 }}>
+								<Button
+									onClick={() => this.handleTryLogin('github')}
+									style={{ margin: 5 }}
+								>
 									<Icon style={{ fontSize: 24 }} type="github" />
 								</Button>
-								<Button>
+								<Button onClick={() => this.handleTryLogin('google')}>
 									<Icon style={{ fontSize: 24 }} type="google" />
 								</Button>
 							</LoginProviders>

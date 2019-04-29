@@ -9,6 +9,35 @@ const byCreatedAt = function(a: any, b: any) {
 	return new Date(a.createdAt) - new Date(b.createdAt)
 }
 
+function* updateRoomPresences(action: AnyAction) {
+	const auth = yield select(state => state.auth)
+	const { uid, ...userData } = auth
+	// get user rooms
+	const userRoomsQuery = yield call(
+		rsf.firestore.getCollection,
+		`users/${auth.uid}/rooms`,
+	)
+
+	if (!userRoomsQuery.empty) {
+		const userRoomIds: string[] = []
+		userRoomsQuery.forEach((userRoomDoc: any) => {
+			userRoomIds.push(userRoomDoc.id)
+		})
+
+		for (var roomId in userRoomIds) {
+			yield call(
+				// @ts-ignore
+				rsf.firestore.setDocument,
+				`rooms/${roomId}/people/${auth.uid}`,
+				{
+					id: auth.uid,
+					...userData,
+				},
+			)
+		}
+	}
+}
+
 function* joinRoom(action: AnyAction) {
 	const { roomId } = action
 	const { uid, displayName, photoURL } = yield select(state => state.auth)
@@ -65,4 +94,8 @@ function* joinRoomSaga() {
 	yield takeEvery('JOIN_ROOM_SAGA', joinRoom)
 }
 
-export default joinRoomSaga
+function* updateRoomPresencesSaga() {
+	yield takeEvery('UPDATE_ROOM_PRESENCES', updateRoomPresences)
+}
+
+export default [joinRoomSaga(), updateRoomPresencesSaga()]

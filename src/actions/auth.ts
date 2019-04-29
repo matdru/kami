@@ -1,9 +1,13 @@
-import { auth, githubAuthProvider } from '../firebase/firebase'
+import {
+	auth,
+	githubAuthProvider,
+	googleAuthProvider,
+} from '../firebase/firebase'
 
-export const loginSuccess = (uid: string, displayName: string) => ({
+export const loginSuccess = (uid: string, userData: any) => ({
 	type: 'LOGIN',
 	uid,
-	displayName,
+	userData,
 })
 
 export const initAuth = () => {
@@ -12,8 +16,12 @@ export const initAuth = () => {
 			if (user) {
 				// user authenticated, update redux
 				if (user) {
-					const displayName = user.displayName || 'Ninja'
-					return dispatch(loginSuccess(user.uid, displayName))
+					const userData = {
+						displayName: user.displayName || 'Ninja',
+						email: user.email,
+						photoURL: user.photoURL,
+					}
+					return dispatch(loginSuccess(user.uid, userData))
 				}
 			} else {
 				// no saved user, create shadow
@@ -31,10 +39,10 @@ export const tryLoginAnonymously = () => {
 				// console.log(response);
 				const { user } = response
 
-				if (user) {
-					const displayName = user.displayName || 'Ninja'
-					return dispatch(loginSuccess(user.uid, displayName))
-				}
+				// if (user) {
+				// 	const displayName = user.displayName || 'Ninja'
+				// 	return dispatch(loginSuccess(user.uid, displayName))
+				// }
 			})
 			.catch(function(error) {
 				console.log({ error })
@@ -46,18 +54,33 @@ export const tryLoginAnonymously = () => {
 	}
 }
 
-export const tryLoginProvider = () => {
+export const tryLoginProvider = (providerName: string) => {
 	return (dispatch: any) => {
+		// pick login provider
+		let provider = null
+		if (providerName === 'github') {
+			provider = githubAuthProvider
+		} else if (providerName === 'google') {
+			provider = googleAuthProvider
+		} else {
+			return Promise.reject('Invalid auth provider')
+		}
+
+		// TODO check if user exits maybe?
+
 		return auth
-			.signInWithPopup(githubAuthProvider)
+			.signInWithPopup(provider)
 			.then(response => {
 				const { user } = response
 
 				console.log({ user })
 
+				// go through user rooms and update people collection with name and picture?
+
 				if (user) {
-					const displayName = user.displayName || 'Ninja'
-					return dispatch(loginSuccess(user.uid, displayName))
+					return dispatch({
+						type: 'UPDATE_USER_ROOM_PRESENCE'
+					})
 				}
 			})
 			.catch(function(error) {
