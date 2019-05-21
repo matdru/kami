@@ -4,15 +4,15 @@ self.__precacheManifest = [
     "url": "/kami/static/js/runtime~main.7a4d96be.js"
   },
   {
-    "revision": "da506e965174dc37c6cd",
-    "url": "/kami/static/js/main.f7fa3fcd.chunk.js"
+    "revision": "52e7fc08f0e137787870",
+    "url": "/kami/static/js/main.e580df5a.chunk.js"
   },
   {
     "revision": "ad345ed8123ea94a649d",
     "url": "/kami/static/js/2.1cbd5be7.chunk.js"
   },
   {
-    "revision": "da506e965174dc37c6cd",
+    "revision": "52e7fc08f0e137787870",
     "url": "/kami/static/css/main.8845288b.chunk.css"
   },
   {
@@ -20,7 +20,7 @@ self.__precacheManifest = [
     "url": "/kami/static/css/2.892e5881.chunk.css"
   },
   {
-    "revision": "445f53b01fd9f5921a351e23d8fdbd44",
+    "revision": "dd0501f964b6b58adf148399e5f58f41",
     "url": "/kami/index.html"
   }
 ];
