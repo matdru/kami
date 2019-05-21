@@ -1,0 +1,9 @@
+export const LOGIN_SUCCESS = 'LOGIN'
+
+export const LOGOUT_SUCCESS = 'LOGOUT'
+
+export const UPDATE_USER_ROOM_PRESENCE = 'UPDATE_USER_ROOM_PRESENCE'
+
+export const CREATE_ROOM = 'CREATE_ROOM'
+export const JOINED_ROOM = 'JOINED_ROOM'
+export const JOIN_ROOM_SAGA = 'JOIN_ROOM_SAGA'

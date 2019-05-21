@@ -15,7 +15,6 @@ import { initSlacker } from '../actions/rooms'
 import '../styles/index.css'
 
 const { Sider } = Layout
-// const { Text } = Typography
 
 const LogoWrap = styled.div`
 	text-align: center;
@@ -46,6 +45,13 @@ const MenuButton = styled.button`
 	&:hover {
 		color: #fff;
 	}
+`
+
+const Content = styled.div`
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 `
 
 interface Props {
@@ -86,7 +92,6 @@ class App extends Component<Props, State> {
 			prevProps.joinedRooms.length === 0 &&
 			joinedRooms.length !== 0
 		) {
-			console.log('redirect to first room?')
 			history.push(`/r/${joinedRooms[0].id}`)
 		}
 	}
@@ -155,11 +160,13 @@ class App extends Component<Props, State> {
 					<Switch>
 						<Route path={'/r/:roomId'} component={RoomContainer} />
 						<Route path={'/'}>
-							{this.props.joinedRooms.length === 0 ? (
-								<LoadingSpinner />
-							) : (
-								<div>No chat selected</div>
-							)}
+							<Content>
+								{this.props.joinedRooms.length === 0 ? (
+									<LoadingSpinner />
+								) : (
+									<div>No chat selected</div>
+								)}
+							</Content>
 						</Route>
 					</Switch>
 				</Layout>

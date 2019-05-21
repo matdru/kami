@@ -1,6 +1,8 @@
-import database, { firebase } from '../firebase/firebase'
+import database from '../firebase/firebase'
 import moment from 'moment'
 // import { ipcRenderer } from 'electron';
+
+import * as types from '../constants/ActionTypes'
 
 const byCreatedAt = function(a: any, b: any) {
 	return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -14,7 +16,7 @@ export interface RoomData {
 }
 
 export const createRoom = ({ id, name, people, messages = [] }: RoomData) => ({
-	type: 'CREATE_ROOM',
+	type: types.CREATE_ROOM,
 	room: {
 		id,
 		name,
@@ -24,12 +26,12 @@ export const createRoom = ({ id, name, people, messages = [] }: RoomData) => ({
 })
 
 export const joinedRoom = (joinedRoom: RoomItem) => ({
-	type: 'JOINED_ROOM',
+	type: types.JOINED_ROOM,
 	joinedRoom,
 })
 
 export const tryJoinRoom = (roomId: string) => ({
-	type: 'JOIN_ROOM_SAGA',
+	type: types.JOIN_ROOM_SAGA,
 	roomId
 })
 
@@ -113,12 +115,6 @@ export const showError = (message: string) => ({
 	message,
 })
 
-// export const sendMessage = (message: any, roomId: string) => ({
-// 	type: 'SEND_MESSAGE',
-// 	message,
-// 	roomId,
-// })
-
 export const updateMessages = (messages: any, roomId: string) => ({
 	type: 'UPDATE_MESSAGES',
 	messages,
@@ -168,22 +164,6 @@ export const leaveRoom = (roomName: string, userId: string) => ({
 	roomName,
 	userId,
 })
-
-// export const startLeaveRoom = (roomName: string) => {
-// 	return (dispatch: any, getState: any) => {
-// 		const user = getState().auth
-// 		if (user) {
-// 			const userId = user.uid
-// 			const displayName = user.displayName
-// 			database.ref(`rooms/${roomName}/people/${userId}`).remove()
-// 			database.ref(`users/${userId}/rooms/${roomName}`).remove(() => {
-// 				dispatch(leaveRoom(roomName, userId))
-// 				dispatch(startSendMessage(`${displayName} left`, roomName, true))
-// 				// history.push("/join");
-// 			})
-// 		}
-// 	}
-// }
 
 export const clearUnread = (
 	roomName: string,

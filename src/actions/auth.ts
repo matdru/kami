@@ -4,8 +4,10 @@ import {
 	googleAuthProvider,
 } from '../firebase/firebase'
 
+import * as types from '../constants/ActionTypes'
+
 export const loginSuccess = (uid: string, userData: any) => ({
-	type: 'LOGIN',
+	type: types.LOGIN_SUCCESS,
 	uid,
 	userData,
 })
@@ -79,7 +81,7 @@ export const tryLoginProvider = (providerName: string) => {
 
 				if (user) {
 					return dispatch({
-						type: 'UPDATE_USER_ROOM_PRESENCE'
+						type: types.UPDATE_USER_ROOM_PRESENCE,
 					})
 				}
 			})
@@ -94,7 +96,7 @@ export const tryLoginProvider = (providerName: string) => {
 }
 
 export const logout = () => ({
-	type: 'LOGOUT',
+	type: types.LOGOUT_SUCCESS,
 })
 
 export const tryLogout = () => {
