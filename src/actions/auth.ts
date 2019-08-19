@@ -12,6 +12,11 @@ export const loginSuccess = (uid: string, userData: any) => ({
 	userData,
 })
 
+export const loginError = (error: any) => ({
+	type: types.LOGIN_SUCCESS,
+	error
+})
+
 export const initAuth = () => {
 	return (dispatch: any) => {
 		return auth.onAuthStateChanged(user => {
@@ -37,9 +42,9 @@ export const tryLoginAnonymously = () => {
 	return (dispatch: any) => {
 		return auth
 			.signInAnonymously()
-			.then(response => {
+			.then(() => {
 				// console.log(response);
-				const { user } = response
+				// const { user } = response
 
 				// if (user) {
 				// 	const displayName = user.displayName || 'Ninja'
@@ -48,10 +53,8 @@ export const tryLoginAnonymously = () => {
 			})
 			.catch(function(error) {
 				console.log({ error })
-				// Handle Errors here.
-				var errorCode = error.code
-				var errorMessage = error.message
-				// ...
+
+				return dispatch(loginError({ error }))
 			})
 	}
 }
@@ -87,10 +90,8 @@ export const tryLoginProvider = (providerName: string) => {
 			})
 			.catch(function(error) {
 				console.log({ error })
-				// Handle Errors here.
-				var errorCode = error.code
-				var errorMessage = error.message
-				// ...
+				
+				return dispatch(loginError({ error }))
 			})
 	}
 }

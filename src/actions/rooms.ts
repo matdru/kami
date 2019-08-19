@@ -81,7 +81,7 @@ export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {
 													people: [roomData.people],
 												}),
 											)
-											const perName = roomData.people.name
+											// const perName = roomData.people.name
 											// dispatch(
 											// 	startSendMessage(
 											// 		`${perName} created this room`,
@@ -103,12 +103,12 @@ export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {
 	}
 }
 
-const isAlreadyAdded = (data: any, id: string) => {
-	for (var key in data) {
-		if (data[key].id === id) return true
-	}
-	return false
-}
+// const isAlreadyAdded = (data: any, id: string) => {
+// 	for (var key in data) {
+// 		if (data[key].id === id) return true
+// 	}
+// 	return false
+// }
 
 export const showError = (message: string) => ({
 	type: 'ERROR_MESSAGE',

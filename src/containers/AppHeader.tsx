@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { Layout, Typography, Avatar, Menu, Dropdown, Icon, Button } from 'antd'
+import { Layout, Typography, Avatar, Icon, Button } from 'antd'
 
 import ProfileDialog from '../components/ProfileDialog'
 
@@ -55,19 +55,19 @@ class AppHeader extends Component<Props, State> {
 	render() {
 		const { room, uid, photoURL } = this.props
 		// TODO plan what is in here
-		const menu = (
-			<Menu>
-				<Menu.Item onClick={this.handleProfileOpen}>
-					<a>Profile</a>
-				</Menu.Item>
-				{/* <Menu.Item>
-					<a>2nd menu item</a>
-				</Menu.Item>
-				<Menu.Item>
-					<a>3rd menu item</a>
-				</Menu.Item> */}
-			</Menu>
-		)
+		// const menu = (
+		// 	<Menu>
+		// 		<Menu.Item onClick={this.handleProfileOpen}>
+		// 			<a>Profile</a>
+		// 		</Menu.Item>
+		// 		{/* <Menu.Item>
+		// 			<a>2nd menu item</a>
+		// 		</Menu.Item>
+		// 		<Menu.Item>
+		// 			<a>3rd menu item</a>
+		// 		</Menu.Item> */}
+		// 	</Menu>
+		// )
 		return (
 			<Header
 				style={{

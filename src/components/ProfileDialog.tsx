@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
-import { Modal, Input, Typography, Row, Col, Icon, Button } from 'antd'
+import { Modal, Typography, Row, Col, Icon, Button } from 'antd'
 import { tryLoginProvider } from '../actions/auth'
-const { TextArea } = Input
-const { Text, Title } = Typography
+const { Title } = Typography
 
 const LoginProviders = styled.div`
 	display: flex;

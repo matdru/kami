@@ -1,15 +1,15 @@
-import { put, select, takeEvery, fork, call } from 'redux-saga/effects'
+import { put, select, takeEvery, call } from 'redux-saga/effects'
 import { AnyAction } from 'redux'
-import database, { firebase, rsf } from '../firebase/firebase'
-import { joinedRoom, showError, syncMessages } from '../actions/rooms'
+import database, { rsf } from '../firebase/firebase'
+import { showError } from '../actions/rooms'
 import { fetchRoomSaga } from './initSaga'
 
-const byCreatedAt = function(a: any, b: any) {
-	// @ts-ignore
-	return new Date(a.createdAt) - new Date(b.createdAt)
-}
+// const byCreatedAt = function(a: any, b: any) {
+// 	// @ts-ignore
+// 	return new Date(a.createdAt) - new Date(b.createdAt)
+// }
 
-function* updateRoomPresences(action: AnyAction) {
+function* updateRoomPresences() {
 	const auth = yield select(state => state.auth)
 	const { uid, ...userData } = auth
 	// get user rooms
@@ -44,7 +44,7 @@ function* joinRoom(action: AnyAction) {
 	const roomRef = database.doc(`rooms/${roomId}`)
 
 	const roomDoc = yield call(rsf.firestore.getDocument, roomRef)
-	const room = <RoomItem>{ id: roomDoc.id, ...roomDoc.data() }
+	const room = { id: roomDoc.id, ...roomDoc.data() } as RoomItem
 
 	if (!room || !roomDoc.exists) {
 		yield put(showError('Room not found!'))

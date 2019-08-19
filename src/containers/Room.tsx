@@ -1,7 +1,7 @@
 import React, { Fragment, Component } from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { Layout, Typography } from 'antd'
+import { Layout } from 'antd'
 
 import LoadingSpinner from '../components/LoadingSpinner'
 import Message from '../components/Message'
@@ -87,10 +87,8 @@ class RoomContainer extends Component<Props> {
 				const {
 					scrollHeight,
 					scrollTop,
-					offsetHeight,
 					clientHeight,
 				} = this.messagesContainer
-				const calculato = scrollHeight - scrollTop === clientHeight
 
 				// if our scroll is around bottom 2 messages, scroll to bottom pls
 				if (Math.abs(clientHeight - (scrollHeight - scrollTop - 45)) < 45) {

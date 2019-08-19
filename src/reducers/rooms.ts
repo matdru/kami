@@ -1,4 +1,3 @@
-import moment from 'moment'
 interface RoomsState {
 	joined: {
 		[key: string]: RoomItem

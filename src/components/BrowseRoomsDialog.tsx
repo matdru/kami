@@ -56,7 +56,9 @@ class BrowseRoomsDialog extends Component<Props, State> {
 							<List.Item.Meta
 								avatar={item.avatarUrl ? <Avatar src={item.avatarUrl} /> : null}
 								title={
-									<a onClick={() => this.handleJoinRoom(item)}>{item.name}</a>
+									<button onClick={() => this.handleJoinRoom(item)}>
+										{item.name}
+									</button>
 								}
 								description={'TODO room descriptions'}
 							/>

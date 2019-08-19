@@ -2,12 +2,12 @@ import { put, select, takeLatest, fork, call } from 'redux-saga/effects'
 import database, { firebase, rsf } from '../firebase/firebase'
 import { availableRooms, createRoom, syncMessages } from '../actions/rooms'
 
-import { Query, CollectionReference } from '@firebase/firestore-types'
+import { CollectionReference } from '@firebase/firestore-types'
 
-const byCreatedAt = function(a: any, b: any) {
-	// @ts-ignore
-	return new Date(a.createdAt) - new Date(b.createdAt)
-}
+// const byCreatedAt = function(a: any, b: any) {
+// 	// @ts-ignore
+// 	return new Date(a.createdAt) - new Date(b.createdAt)
+// }
 
 export function* fetchRoomSaga(roomId: string) {
 	console.log('try fetch room ', roomId)
@@ -32,10 +32,11 @@ export function* fetchRoomSaga(roomId: string) {
 		console.log({ people })
 
 		// get room's messages first page
-		const messagePage = <CollectionReference>roomRef
+		const messagePage = roomRef
 			.collection('messages')
 			.orderBy('createdAt', 'desc')
-			.limit(25)
+			.limit(25) as CollectionReference
+
 		const messagesQuery = yield call(rsf.firestore.getCollection, messagePage)
 
 		messagesQuery.forEach((messageDoc: any) => {
@@ -53,10 +54,10 @@ export function* fetchRoomSaga(roomId: string) {
 		)
 
 		// subscribe to messages
-		const newestMessage = <CollectionReference>roomRef
+		const newestMessage = roomRef
 			.collection('messages')
 			.orderBy('createdAt', 'desc')
-			.limit(1)
+			.limit(1) as CollectionReference
 
 		// TODO merge this with other messages to save on reads
 		yield fork(rsf.firestore.syncCollection, newestMessage, {
@@ -105,7 +106,7 @@ function* initSlackerSaga(action: any) {
 
 		// fetch each joined room
 		for (let roomId of userRoomIds) {
-			const task = yield fork(fetchRoomSaga, roomId)
+			yield fork(fetchRoomSaga, roomId)
 		}
 
 		// if no general room, join that as well
