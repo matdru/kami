@@ -1,15 +1,10 @@
-import { put, select, takeEvery, call } from 'redux-saga/effects'
+import { put, select, takeEvery, call, fork } from 'redux-saga/effects'
 import { AnyAction } from 'redux'
 import database, { rsf } from '../firebase/firebase'
-import { showError } from '../actions/rooms'
-import { fetchRoomSaga } from './initSaga'
+import { showError, createRoom, syncMessages } from '../actions/rooms'
+import { CollectionReference } from '@firebase/firestore-types'
 
-// const byCreatedAt = function(a: any, b: any) {
-// 	// @ts-ignore
-// 	return new Date(a.createdAt) - new Date(b.createdAt)
-// }
-
-function* updateRoomPresences() {
+export function* updateRoomPresences() {
 	const auth = yield select(state => state.auth)
 	const { uid, ...userData } = auth
 	// get user rooms
@@ -38,7 +33,7 @@ function* updateRoomPresences() {
 	}
 }
 
-function* joinRoom(action: AnyAction) {
+export function* joinRoom(action: AnyAction) {
 	const { roomId } = action
 	const { uid, displayName, photoURL } = yield select(state => state.auth)
 	const roomRef = database.doc(`rooms/${roomId}`)
@@ -86,16 +81,73 @@ function* joinRoom(action: AnyAction) {
 		)
 
 		// fetch full room and subscribe
-		yield call(fetchRoomSaga, roomId)
+		yield call(fetchRoom, roomId)
 	}
 }
 
-function* joinRoomSaga() {
+export function* fetchRoom(roomId: string) {
+	console.log('try fetch room ', roomId)
+	// fetch joined room from firestore
+	const roomRef = database.collection('rooms').doc(roomId)
+	const roomDoc = yield call(rsf.firestore.getDocument, roomRef)
+
+	// if we have such room
+	if (roomDoc.exists) {
+		const room = roomDoc.data()
+		const people: any[] = []
+		const messages: any = {}
+
+		// get room's people
+		const peopleQuery = yield call(
+			rsf.firestore.getCollection,
+			roomRef.collection('people'),
+		)
+		peopleQuery.forEach((peopleDoc: any) => {
+			people.push({ id: peopleDoc.id, ...peopleDoc.data() })
+		})
+		console.log({ people })
+
+		// get room's messages first page
+		const messagePage = roomRef
+			.collection('messages')
+			.orderBy('createdAt', 'desc')
+			.limit(25) as CollectionReference
+
+		const messagesQuery = yield call(rsf.firestore.getCollection, messagePage)
+
+		messagesQuery.forEach((messageDoc: any) => {
+			messages[messageDoc.id] = { id: messageDoc.id, ...messageDoc.data() }
+		})
+		// messages.sort(byCreatedAt)
+
+		yield put(
+			createRoom({
+				id: roomRef.id,
+				name: room ? room.name : 'Error',
+				people,
+				messages,
+			}),
+		)
+
+		// subscribe to latest message
+		const newestMessage = roomRef
+			.collection('messages')
+			.orderBy('createdAt', 'desc')
+			.limit(1) as CollectionReference
+
+		// TODO merge this with other messages to save on reads
+		yield fork(rsf.firestore.syncCollection, newestMessage, {
+			successActionCreator: (snapshot: any) => syncMessages(snapshot, roomId),
+		})
+	}
+}
+
+function* joinRoomListener() {
 	yield takeEvery('JOIN_ROOM_SAGA', joinRoom)
 }
 
-function* updateRoomPresencesSaga() {
+function* updateRoomPresencesListener() {
 	yield takeEvery('UPDATE_ROOM_PRESENCES', updateRoomPresences)
 }
 
-export default [joinRoomSaga(), updateRoomPresencesSaga()]
+export default [joinRoomListener(), updateRoomPresencesListener()]

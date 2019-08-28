@@ -2,12 +2,7 @@ import { put, select, takeEvery, fork, call } from 'redux-saga/effects'
 import { AnyAction } from 'redux'
 import database, { firebase, rsf } from '../firebase/firebase'
 import { joinedRoom, showError, syncMessages } from '../actions/rooms'
-import { fetchRoomSaga } from './initSaga'
-
-const byCreatedAt = function(a: any, b: any) {
-	// @ts-ignore
-	return new Date(a.createdAt) - new Date(b.createdAt)
-}
+import { fetchRoom } from './roomSagas'
 
 function* joinRoom(action: AnyAction) {
 	const { roomId } = action
@@ -57,12 +52,12 @@ function* joinRoom(action: AnyAction) {
 		)
 
 		// fetch full room and subscribe
-		yield call(fetchRoomSaga, roomId)
+		yield call(fetchRoom, roomId)
 	}
 }
 
-function* joinRoomSaga() {
+function* joinRoomListener() {
 	yield takeEvery('JOIN_ROOM_SAGA', joinRoom)
 }
 
-export default joinRoomSaga
+export default joinRoomListener
