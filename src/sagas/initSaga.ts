@@ -1,6 +1,7 @@
 import { put, select, takeLatest, fork, call } from 'redux-saga/effects'
 import database, { firebase, rsf } from '../firebase/firebase'
 import { availableRooms } from '../actions/rooms'
+import * as types from '../constants/ActionTypes'
 import { fetchRoom } from './roomSagas'
 
 // worker Saga
@@ -49,7 +50,7 @@ function* initSlacker(action: any) {
 		// if no general room, join that as well
 		if (generalRoom && !userRoomIds.includes(generalRoom.id)) {
 			yield put({
-				type: 'JOIN_ROOM_SAGA',
+				type: types.JOIN_ROOM_SAGA,
 				roomId: generalRoom.id,
 				room: generalRoom,
 			})
@@ -57,7 +58,7 @@ function* initSlacker(action: any) {
 	} else {
 		if (generalRoom) {
 			yield put({
-				type: 'JOIN_ROOM_SAGA',
+				type: types.JOIN_ROOM_SAGA,
 				roomId: generalRoom.id,
 				room: generalRoom,
 			})
@@ -66,7 +67,7 @@ function* initSlacker(action: any) {
 }
 
 function* initSlackerListner() {
-	yield takeLatest('INIT_SLACKER_SAGA', initSlacker)
+	yield takeLatest(types.INIT_SLACKER_SAGA, initSlacker)
 }
 
 export default initSlackerListner

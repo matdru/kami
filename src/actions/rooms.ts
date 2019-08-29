@@ -17,7 +17,7 @@ export interface RoomData {
 	canFetchMore?: boolean
 }
 
-export const createRoom = ({
+export const updateRoom = ({
 	id,
 	name,
 	people,
@@ -25,7 +25,7 @@ export const createRoom = ({
 	canFetchMore,
 	messageCount,
 }: RoomData) => ({
-	type: types.CREATE_ROOM,
+	type: types.UPDATE_ROOM,
 	room: {
 		id,
 		name,
@@ -86,7 +86,7 @@ export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {
 												.set({ roomName: room.name })
 
 											dispatch(
-												createRoom({
+												updateRoom({
 													id: roomRef.id,
 													...roomData,
 													people: [roomData.people],
@@ -114,20 +114,13 @@ export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {
 	}
 }
 
-// const isAlreadyAdded = (data: any, id: string) => {
-// 	for (var key in data) {
-// 		if (data[key].id === id) return true
-// 	}
-// 	return false
-// }
-
 export const showError = (message: string) => ({
 	type: 'ERROR_MESSAGE',
 	message,
 })
 
 export const updateMessages = (messages: any, roomId: string) => ({
-	type: 'UPDATE_MESSAGES',
+	type: types.UPDATE_MESSAGES,
 	messages,
 	roomId,
 })
@@ -158,12 +151,12 @@ export const orderRoomsStartState = () => ({
 })
 
 export const availableRooms = (rooms: RoomItem[]) => ({
-	type: 'AVAILABLE_ROOMS',
+	type: types.UPDATE_AVAILABLE_ROOMS,
 	rooms,
 })
 
 export const initSlacker = () => ({
-	type: 'INIT_SLACKER_SAGA',
+	type: types.INIT_SLACKER_SAGA,
 })
 
 export const clearState = {

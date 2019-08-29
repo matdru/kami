@@ -1,3 +1,5 @@
+import * as types from '../constants/ActionTypes'
+
 interface RoomsState {
 	joined: {
 		[key: string]: RoomItem
@@ -14,18 +16,18 @@ const defaultState: RoomsState = {
 
 export default (state: RoomsState = defaultState, action: any) => {
 	switch (action.type) {
-		case 'CREATE_ROOM':
+		case types.UPDATE_ROOM:
 			return {
 				...state,
 				joined: { ...state.joined, [action.room.id]: action.room },
 			}
-		case 'JOINED_ROOM':
+		case types.JOINED_ROOM:
 			return {
 				...state,
 				joined: { ...state.joined, [action.room.id]: action.room },
 			}
 
-		case 'AVAILABLE_ROOMS':
+		case types.UPDATE_AVAILABLE_ROOMS:
 			return {
 				...state,
 				available: {
@@ -39,7 +41,7 @@ export default (state: RoomsState = defaultState, action: any) => {
 				},
 			}
 
-		case 'SEND_MESSAGE':
+		case types.SEND_MESSAGE:
 			return {
 				...state,
 				joined: {
@@ -53,7 +55,7 @@ export default (state: RoomsState = defaultState, action: any) => {
 					},
 				},
 			}
-		case 'UPDATE_MESSAGES':
+		case types.UPDATE_MESSAGES:
 			return {
 				...state,
 				joined: {
@@ -73,33 +75,6 @@ export default (state: RoomsState = defaultState, action: any) => {
 					},
 				},
 			}
-
-		// case 'CLEAR_UNREAD':
-		// 	return state.map(room => {
-		// 		if (room.name === action.roomName) {
-		// 			const people = room.people.map((person: Person) => {
-		// 				if (person.id === action.uid) {
-		// 					return {
-		// 						...person,
-		// 						unread: action.unread,
-		// 						lastRead: action.time,
-		// 					}
-		// 				} else {
-		// 					return person
-		// 				}
-		// 			})
-		// 			return { ...room, people }
-		// 		} else {
-		// 			return room
-		// 		}
-		// 	})
-
-		// case 'LEAVE_ROOM':
-		// 	return state.filter(room => {
-		// 		return room.name !== action.roomName
-		// 	})
-		// case 'CLEAR_STATE':
-		// 	return []
 		default:
 			return state
 	}

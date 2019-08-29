@@ -1,8 +1,10 @@
 import { put, select, takeEvery, call, fork } from 'redux-saga/effects'
 import { AnyAction } from 'redux'
 import database, { rsf } from '../firebase/firebase'
-import { showError, createRoom, syncMessages } from '../actions/rooms'
-import { CollectionReference, QuerySnapshot, Query } from '@firebase/firestore-types'
+import * as types from '../constants/ActionTypes'
+import { showError, updateRoom, syncMessages } from '../actions/rooms'
+import { CollectionReference, QuerySnapshot } from '@firebase/firestore-types'
+import { makeGetEarliestMessageForRoomId } from '../selectors/room'
 
 export function* updateRoomPresences() {
 	const auth = yield select(state => state.auth)
@@ -63,8 +65,6 @@ export function* joinRoom(action: AnyAction) {
 			lastRead: 0,
 		}
 
-		console.log({ person })
-
 		// TODO figure wtf is wrong here
 		yield call(
 			// @ts-ignore
@@ -87,18 +87,20 @@ export function* joinRoom(action: AnyAction) {
 
 export function* fetchMessages(roomRef: any, cursor?: any) {
 	const messages: any = {}
-	const messages2: any = {}
 
 	let messagePage = roomRef
-	.collection('messages')
-	.orderBy('createdAt', 'desc')
-	.limit(35) as CollectionReference
+		.collection('messages')
+		.orderBy('createdAt', 'desc')
+		.limit(35) as CollectionReference
 
 	if (cursor) {
 		messagePage = messagePage.startAfter(cursor) as CollectionReference
 	}
 
-	const messagesQuery : QuerySnapshot = yield call(rsf.firestore.getCollection, messagePage)
+	const messagesQuery: QuerySnapshot = yield call(
+		rsf.firestore.getCollection,
+		messagePage,
+	)
 
 	// const lastMessageQuery = messagesQuery.docs[messagesQuery.size - 1]
 	// const lastMessage = { id: lastMessageQuery.id, ...lastMessageQuery.data() }
@@ -150,7 +152,7 @@ export function* fetchRoom(roomId: string) {
 		const messages = yield call(fetchMessages, roomRef)
 
 		yield put(
-			createRoom({
+			updateRoom({
 				id: roomRef.id,
 				name: room ? room.name : 'Error',
 				people,
@@ -181,17 +183,21 @@ export function* fetchMoreMessages(roomId: string) {
 
 	if (roomDoc.exists) {
 		// find oldest message
+		const getEarliestMessageInRoom = makeGetEarliestMessageForRoomId(roomId)
+		const earliestMessage = yield select(getEarliestMessageInRoom)
+
+		console.log({ earliestMessage })
 
 		// fetch next page after that message
 	}
 }
 
 function* joinRoomListener() {
-	yield takeEvery('JOIN_ROOM_SAGA', joinRoom)
+	yield takeEvery(types.JOIN_ROOM_SAGA, joinRoom)
 }
 
 function* updateRoomPresencesListener() {
-	yield takeEvery('UPDATE_ROOM_PRESENCES', updateRoomPresences)
+	yield takeEvery(types.UPDATE_ROOM_PRESENCES, updateRoomPresences)
 }
 
 export default [joinRoomListener(), updateRoomPresencesListener()]
