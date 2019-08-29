@@ -2,7 +2,7 @@ import { put, select, takeEvery, call, fork } from 'redux-saga/effects'
 import { AnyAction } from 'redux'
 import database, { rsf } from '../firebase/firebase'
 import { showError, createRoom, syncMessages } from '../actions/rooms'
-import { CollectionReference } from '@firebase/firestore-types'
+import { CollectionReference, QuerySnapshot, Query } from '@firebase/firestore-types'
 
 export function* updateRoomPresences() {
 	const auth = yield select(state => state.auth)
@@ -85,6 +85,46 @@ export function* joinRoom(action: AnyAction) {
 	}
 }
 
+export function* fetchMessages(roomRef: any, cursor?: any) {
+	const messages: any = {}
+	const messages2: any = {}
+
+	let messagePage = roomRef
+	.collection('messages')
+	.orderBy('createdAt', 'desc')
+	.limit(35) as CollectionReference
+
+	if (cursor) {
+		messagePage = messagePage.startAfter(cursor) as CollectionReference
+	}
+
+	const messagesQuery : QuerySnapshot = yield call(rsf.firestore.getCollection, messagePage)
+
+	// const lastMessageQuery = messagesQuery.docs[messagesQuery.size - 1]
+	// const lastMessage = { id: lastMessageQuery.id, ...lastMessageQuery.data() }
+
+	messagesQuery.forEach((messageDoc: any) => {
+		messages[messageDoc.id] = { id: messageDoc.id, ...messageDoc.data() }
+	})
+
+	// const messagePage2 = roomRef
+	// .collection('messages')
+	// .orderBy('createdAt', 'desc')
+	// // @ts-ignore
+	// .startAfter(lastMessage.createdAt)
+	// .limit(35) as CollectionReference
+
+	// const messagesQuery2 = yield call(rsf.firestore.getCollection, messagePage2)
+
+	// messagesQuery2.forEach((messageDoc: any) => {
+	// 	messages[messageDoc.id] = { id: messageDoc.id, ...messageDoc.data() }
+	// })
+
+	// console.log({ messages, m1Count: Object.keys(messages).length, messages2, m2Count: Object.keys(messages2).length })
+
+	return messages
+}
+
 export function* fetchRoom(roomId: string) {
 	console.log('try fetch room ', roomId)
 	// fetch joined room from firestore
@@ -95,7 +135,6 @@ export function* fetchRoom(roomId: string) {
 	if (roomDoc.exists) {
 		const room = roomDoc.data()
 		const people: any[] = []
-		const messages: any = {}
 
 		// get room's people
 		const peopleQuery = yield call(
@@ -108,17 +147,7 @@ export function* fetchRoom(roomId: string) {
 		console.log({ people })
 
 		// get room's messages first page
-		const messagePage = roomRef
-			.collection('messages')
-			.orderBy('createdAt', 'desc')
-			.limit(25) as CollectionReference
-
-		const messagesQuery = yield call(rsf.firestore.getCollection, messagePage)
-
-		messagesQuery.forEach((messageDoc: any) => {
-			messages[messageDoc.id] = { id: messageDoc.id, ...messageDoc.data() }
-		})
-		// messages.sort(byCreatedAt)
+		const messages = yield call(fetchMessages, roomRef)
 
 		yield put(
 			createRoom({
@@ -126,6 +155,8 @@ export function* fetchRoom(roomId: string) {
 				name: room ? room.name : 'Error',
 				people,
 				messages,
+				messageCount: messages.length,
+				canFetchMore: messages.length === 35,
 			}),
 		)
 
@@ -139,6 +170,19 @@ export function* fetchRoom(roomId: string) {
 		yield fork(rsf.firestore.syncCollection, newestMessage, {
 			successActionCreator: (snapshot: any) => syncMessages(snapshot, roomId),
 		})
+	}
+}
+
+export function* fetchMoreMessages(roomId: string) {
+	console.log('try fetch room ', roomId)
+	// fetch joined room from firestore
+	const roomRef = database.collection('rooms').doc(roomId)
+	const roomDoc = yield call(rsf.firestore.getDocument, roomRef)
+
+	if (roomDoc.exists) {
+		// find oldest message
+
+		// fetch next page after that message
 	}
 }
 

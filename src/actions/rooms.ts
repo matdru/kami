@@ -13,15 +13,26 @@ export interface RoomData {
 	name: string
 	people: any
 	messages?: any
+	messageCount?: number
+	canFetchMore?: boolean
 }
 
-export const createRoom = ({ id, name, people, messages = [] }: RoomData) => ({
+export const createRoom = ({
+	id,
+	name,
+	people,
+	messages = [],
+	canFetchMore,
+	messageCount,
+}: RoomData) => ({
 	type: types.CREATE_ROOM,
 	room: {
 		id,
 		name,
 		people,
 		messages,
+		canFetchMore,
+		messageCount,
 	},
 })
 
@@ -32,7 +43,7 @@ export const joinedRoom = (joinedRoom: RoomItem) => ({
 
 export const tryJoinRoom = (roomId: string) => ({
 	type: types.JOIN_ROOM_SAGA,
-	roomId
+	roomId,
 })
 
 export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {

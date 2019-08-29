@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { Layout, Typography, Avatar, Icon, Button } from 'antd'
+import { Layout, Typography, Avatar, Button } from 'antd'
 
 import ProfileDialog from '../components/ProfileDialog'
 
@@ -85,9 +85,7 @@ class AppHeader extends Component<Props, State> {
 				</Title>
 				{!!uid && (
 					<TopRightMenu>
-						<Button shape="circle" style={{ paddingTop: 1, marginRight: 10 }}>
-							<Icon type="setting" />
-						</Button>
+						<Button icon="setting" shape="circle" style={{ paddingTop: 1, marginRight: 10 }} />
 
 						<AccountButton onClick={this.handleProfileOpen}>
 							<Avatar src={photoURL} size={35} shape="square" />
