@@ -1,0 +1,1 @@
+{"version":3,"sources":["index.css"],"names":[],"mappings":"AAAA,MACE,WAAY,CACZ,6BAAgC,CAChC,WACF","file":"main.bcf5a46d.chunk.css","sourcesContent":[".logo {\n  height: 32px;\n  background: rgba(255,255,255,.2);\n  margin: 16px;\n}"]}
