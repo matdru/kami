@@ -68,7 +68,7 @@ class BrowseRoomsDialog extends Component<Props, State> {
 										Join
 									</Button>
 								) : (
-									<Label>joined</Label>
+									<Label>Active</Label>
 								)}
 							</div>
 						</List.Item>
@@ -82,10 +82,10 @@ class BrowseRoomsDialog extends Component<Props, State> {
 }
 
 const mapStateToProps = (state: StoreState) => {
-	const { available, joined } = state.rooms
+	const { available, active } = state.rooms
 	const roomList = Object.values(available).map(room => {
 		const canJoin =
-			Object.values(joined).find(item => item.id === room.id) === undefined
+			Object.values(active).find(item => item.id === room.id) === undefined
 		return {
 			...room,
 			canJoin,

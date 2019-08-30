@@ -58,7 +58,7 @@ interface Props {
 	initAuth: () => void
 	initSlacker: () => void
 	auth: Auth
-	joinedRooms: RoomItem[]
+	activeRooms: RoomItem[]
 	availableRooms: RoomItem[]
 	history: any
 	location: {
@@ -79,20 +79,18 @@ class App extends Component<Props, State> {
 		this.props.initAuth()
 	}
 
-	componentWillUpdate(nextProps: Props) {
-		if (!this.props.auth.uid && nextProps.auth.uid) {
-			this.props.initSlacker()
-		}
-	}
-
 	componentDidUpdate(prevProps: Props) {
-		const { location, joinedRooms, history } = this.props
+		const { location, activeRooms, history } = this.props
 		if (
 			location.pathname === '/' &&
-			prevProps.joinedRooms.length === 0 &&
-			joinedRooms.length !== 0
+			prevProps.activeRooms.length === 0 &&
+			activeRooms.length !== 0
 		) {
-			history.push(`/r/${joinedRooms[0].id}`)
+			history.push(`/r/${activeRooms[0].id}`)
+		}
+
+		if (!prevProps.auth.uid && this.props.auth.uid) {
+			this.props.initSlacker()
 		}
 	}
 
@@ -149,7 +147,7 @@ class App extends Component<Props, State> {
 						onSelect={this.handleRoomSelect}
 						selectedKeys={[this.props.location.pathname]}
 					>
-						{this.props.joinedRooms.map(room => (
+						{this.props.activeRooms.map(room => (
 							<Menu.Item key={`/r/${room.id}`}>
 								<span className="nav-text"># {room.name}</span>
 							</Menu.Item>
@@ -161,7 +159,7 @@ class App extends Component<Props, State> {
 						<Route path={'/r/:roomId'} component={RoomContainer} />
 						<Route path={'/'}>
 							<Content>
-								{this.props.joinedRooms.length === 0 ? (
+								{this.props.activeRooms.length === 0 ? (
 									<LoadingSpinner />
 								) : (
 									<div>No chat selected</div>
@@ -177,7 +175,7 @@ class App extends Component<Props, State> {
 
 const mapStateToProps = (state: StoreState) => ({
 	auth: state.auth,
-	joinedRooms: Object.values(state.rooms.joined),
+	activeRooms: Object.values(state.rooms.active),
 	availableRooms: Object.values(state.rooms.available),
 })
 

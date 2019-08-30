@@ -1,7 +1,7 @@
 import * as types from '../constants/ActionTypes'
 
 interface RoomsState {
-	joined: {
+	active: {
 		[key: string]: RoomItem
 	}
 	available: {
@@ -10,7 +10,7 @@ interface RoomsState {
 }
 
 const defaultState: RoomsState = {
-	joined: {},
+	active: {},
 	available: {},
 }
 
@@ -19,12 +19,12 @@ export default (state: RoomsState = defaultState, action: any) => {
 		case types.UPDATE_ROOM:
 			return {
 				...state,
-				joined: { ...state.joined, [action.room.id]: action.room },
+				active: { ...state.active, [action.room.id]: action.room },
 			}
-		case types.JOINED_ROOM:
+		case types.ACTIVE_ROOM:
 			return {
 				...state,
-				joined: { ...state.joined, [action.room.id]: action.room },
+				active: { ...state.active, [action.room.id]: action.room },
 			}
 
 		case types.UPDATE_AVAILABLE_ROOMS:
@@ -44,12 +44,12 @@ export default (state: RoomsState = defaultState, action: any) => {
 		case types.SEND_MESSAGE:
 			return {
 				...state,
-				joined: {
-					...state.joined,
+				active: {
+					...state.active,
 					[action.roomId]: {
-						...[state.joined[action.roomId]],
+						...[state.active[action.roomId]],
 						messages: {
-							...state.joined[action.roomId].messages,
+							...state.active[action.roomId].messages,
 							[action.message.id]: action.message,
 						},
 					},
@@ -58,12 +58,12 @@ export default (state: RoomsState = defaultState, action: any) => {
 		case types.UPDATE_MESSAGES:
 			return {
 				...state,
-				joined: {
-					...state.joined,
+				active: {
+					...state.active,
 					[action.roomId]: {
-						...state.joined[action.roomId],
+						...state.active[action.roomId],
 						messages: {
-							...state.joined[action.roomId].messages,
+							...state.active[action.roomId].messages,
 							...action.messages.reduce(
 								(acc: any, message: Message) => ({
 									...acc,

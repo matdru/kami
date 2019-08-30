@@ -1,34 +1,15 @@
-import React, { Fragment, Component } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import styled from 'styled-components'
-import { Layout } from 'antd'
 
-import LoadingSpinner from '../components/LoadingSpinner'
-import Message from '../components/Message'
-import ChatInput from '../components/ChatInput'
-import AppHeader from './AppHeader'
+import Conversation from '../components/Conversation'
+import Room from '../components/Room'
 
 import { trySendMessage } from '../actions/rooms'
 import getProps from '../selectors/room'
 
-const { Content } = Layout
-
-const ChatWrapper = styled.div`
-	/* height: 100%; */
-	width: 100%;
-	padding: 24;
-	display: flex;
-	flex-direction: column;
-	background: '#fff';
-`
-
-const Messages = styled.div`
-	padding-top: 8px;
-	padding-bottom: 8px;
-	flex-grow: 1;
-	overflow-y: scroll;
-	overflow-x: hidden;
-`
+interface State {
+	loadMoreVisible: boolean | null
+}
 
 interface Props {
 	auth: Auth
@@ -39,13 +20,16 @@ interface Props {
 	trySendMessage: (text: string, roomId: string, status?: boolean) => void
 }
 
-class RoomContainer extends Component<Props> {
+class RoomContainer extends Component<Props, State> {
 	messagesEnd: any = null
 	messagesContainer: HTMLElement | null = null
 
-	componentWillMount() {
-		const { roomId } = this.props.match.params
-		console.log(roomId)
+	constructor(props: Props) {
+		super(props)
+
+		this.state = {
+			loadMoreVisible: null,
+		}
 	}
 
 	componentDidMount() {
@@ -84,11 +68,7 @@ class RoomContainer extends Component<Props> {
 				this.scrollToBottom()
 			} else if (this.messagesContainer) {
 				// last message is not ours, lets check scroll
-				const {
-					scrollHeight,
-					scrollTop,
-					clientHeight,
-				} = this.messagesContainer
+				const { scrollHeight, scrollTop, clientHeight } = this.messagesContainer
 
 				// if our scroll is around bottom 2 messages, scroll to bottom pls
 				if (Math.abs(clientHeight - (scrollHeight - scrollTop - 45)) < 45) {
@@ -104,53 +84,29 @@ class RoomContainer extends Component<Props> {
 		}
 	}
 
+	handleLoadMoreVisibilityChange = (isVisible: any) => {
+		if (isVisible && this.state.loadMoreVisible === false) {
+			console.log('load more messages')
+		}
+
+		this.setState({
+			loadMoreVisible: isVisible,
+		})
+	}
+
 	render() {
 		const { room, messages, isLoading } = this.props
-		let content = <LoadingSpinner />
-		if (!isLoading) {
-			content = (
-				<ChatWrapper>
-					<Messages
-						ref={el => {
-							this.messagesContainer = el
-						}}
-					>
-						{messages.map((message, idx) => (
-							<Message
-								isConsecutive={
-									!!messages[idx - 1] &&
-									messages[idx - 1].sender.uid === message.sender.uid
-								}
-								name={message.sender.displayName || ''}
-								key={message.id}
-							>
-								{message.text}
-							</Message>
-						))}
-						<div
-							style={{ float: 'left', clear: 'both' }}
-							ref={el => {
-								this.messagesEnd = el
-							}}
-						/>
-					</Messages>
-					<ChatInput room={this.props.room} />
-				</ChatWrapper>
-			)
-		}
+
 		return (
-			<Fragment>
-				<AppHeader room={room} />
-				<Content
-					style={{
-						margin: '0px 16px 24px 16px',
-						overflow: 'initial',
-						display: 'flex'
-					}}
-				>
-					{content}
-				</Content>
-			</Fragment>
+			<Room room={room} isLoading={isLoading}>
+				<Conversation
+					room={room}
+					messages={messages}
+					onLoadMoreVisibilityChange={this.handleLoadMoreVisibilityChange}
+					getMessagesRef={ref => (this.messagesContainer = ref)}
+					getBottomAnchorRef={ref => (this.messagesEnd = ref)}
+				/>
+			</Room>
 		)
 	}
 }

@@ -41,10 +41,12 @@ interface RoomItem {
 	messages: Message[]
 }
 
+interface Rooms {
+	active: { [key: string]: RoomItem }
+	available: { [key: string]: RoomItem }
+}
+
 interface StoreState {
 	auth: Auth
-	rooms: {
-		joined: { [key: string]: RoomItem }
-		available: { [key: string]: RoomItem }
-	}
+	rooms: Rooms
 }

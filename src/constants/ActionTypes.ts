@@ -10,7 +10,7 @@ export const UPDATE_ROOM = 'UPDATE_ROOM'
 export const UPDATE_AVAILABLE_ROOMS = 'UPDATE_AVAILABLE_ROOMS'
 
 // room related events
-export const JOINED_ROOM = 'JOINED_ROOM'
+export const ACTIVE_ROOM = 'ACTIVE_ROOM'
 export const SEND_MESSAGE = 'SEND_MESSAGE'
 
 // saga triggers

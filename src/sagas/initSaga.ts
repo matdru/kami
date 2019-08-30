@@ -42,7 +42,7 @@ function* initSlacker(action: any) {
 			userRoomIds.push(userRoomDoc.id),
 		)
 
-		// fetch each joined room
+		// fetch each active room
 		for (let roomId of userRoomIds) {
 			yield fork(fetchRoom, roomId)
 		}

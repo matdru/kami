@@ -36,9 +36,9 @@ export const updateRoom = ({
 	},
 })
 
-export const joinedRoom = (joinedRoom: RoomItem) => ({
-	type: types.JOINED_ROOM,
-	joinedRoom,
+export const activeRoom = (activeRoom: RoomItem) => ({
+	type: types.ACTIVE_ROOM,
+	activeRoom,
 })
 
 export const tryJoinRoom = (roomId: string) => ({

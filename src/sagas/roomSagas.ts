@@ -129,7 +129,7 @@ export function* fetchMessages(roomRef: any, cursor?: any) {
 
 export function* fetchRoom(roomId: string) {
 	console.log('try fetch room ', roomId)
-	// fetch joined room from firestore
+	// fetch active room from firestore
 	const roomRef = database.collection('rooms').doc(roomId)
 	const roomDoc = yield call(rsf.firestore.getDocument, roomRef)
 
@@ -177,7 +177,7 @@ export function* fetchRoom(roomId: string) {
 
 export function* fetchMoreMessages(roomId: string) {
 	console.log('try fetch room ', roomId)
-	// fetch joined room from firestore
+	// fetch active room from firestore
 	const roomRef = database.collection('rooms').doc(roomId)
 	const roomDoc = yield call(rsf.firestore.getDocument, roomRef)
 
