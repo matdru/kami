@@ -102,27 +102,9 @@ export function* fetchMessages(roomRef: any, cursor?: any) {
 		messagePage,
 	)
 
-	// const lastMessageQuery = messagesQuery.docs[messagesQuery.size - 1]
-	// const lastMessage = { id: lastMessageQuery.id, ...lastMessageQuery.data() }
-
 	messagesQuery.forEach((messageDoc: any) => {
 		messages[messageDoc.id] = { id: messageDoc.id, ...messageDoc.data() }
 	})
-
-	// const messagePage2 = roomRef
-	// .collection('messages')
-	// .orderBy('createdAt', 'desc')
-	// // @ts-ignore
-	// .startAfter(lastMessage.createdAt)
-	// .limit(35) as CollectionReference
-
-	// const messagesQuery2 = yield call(rsf.firestore.getCollection, messagePage2)
-
-	// messagesQuery2.forEach((messageDoc: any) => {
-	// 	messages[messageDoc.id] = { id: messageDoc.id, ...messageDoc.data() }
-	// })
-
-	// console.log({ messages, m1Count: Object.keys(messages).length, messages2, m2Count: Object.keys(messages2).length })
 
 	return messages
 }
@@ -146,7 +128,6 @@ export function* fetchRoom(roomId: string) {
 		peopleQuery.forEach((peopleDoc: any) => {
 			people.push({ id: peopleDoc.id, ...peopleDoc.data() })
 		})
-		console.log({ people })
 
 		// get room's messages first page
 		const messages = yield call(fetchMessages, roomRef)
@@ -162,20 +143,27 @@ export function* fetchRoom(roomId: string) {
 			}),
 		)
 
-		// subscribe to latest message
-		const newestMessage = roomRef
-			.collection('messages')
-			.orderBy('createdAt', 'desc')
-			.limit(1) as CollectionReference
-
-		// TODO merge this with other messages to save on reads
-		yield fork(rsf.firestore.syncCollection, newestMessage, {
-			successActionCreator: (snapshot: any) => syncMessages(snapshot, roomId),
-		})
+		yield call(subscribeToLastMessage, roomRef)
 	}
 }
 
-export function* fetchMoreMessages(roomId: string) {
+export function* subscribeToLastMessage(
+	roomRef: firebase.firestore.DocumentReference,
+) {
+	// subscribe to latest message
+	const newestMessage = roomRef
+		.collection('messages')
+		.orderBy('createdAt', 'desc')
+		.limit(1) as CollectionReference
+
+	// TODO merge this with other messages to save on reads
+	yield fork(rsf.firestore.syncCollection, newestMessage, {
+		successActionCreator: (snapshot: any) => syncMessages(snapshot, roomRef.id),
+	})
+}
+
+export function* fetchMoreMessages(action: AnyAction) {
+	const { roomId } = action
 	console.log('try fetch room ', roomId)
 	// fetch active room from firestore
 	const roomRef = database.collection('rooms').doc(roomId)
@@ -192,6 +180,10 @@ export function* fetchMoreMessages(roomId: string) {
 	}
 }
 
+function* fetchMoreMessagesListener() {
+	yield takeEvery(types.FETCH_MESSAGES_REQUEST, fetchMoreMessages)
+}
+
 function* joinRoomListener() {
 	yield takeEvery(types.JOIN_ROOM_SAGA, joinRoom)
 }
@@ -200,4 +192,8 @@ function* updateRoomPresencesListener() {
 	yield takeEvery(types.UPDATE_ROOM_PRESENCES, updateRoomPresences)
 }
 
-export default [joinRoomListener(), updateRoomPresencesListener()]
+export default [
+	joinRoomListener(),
+	updateRoomPresencesListener(),
+	fetchMoreMessagesListener(),
+]

@@ -92,17 +92,14 @@ export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {
 													people: [roomData.people],
 												}),
 											)
-											// const perName = roomData.people.name
-											// dispatch(
-											// 	startSendMessage(
-											// 		`${perName} created this room`,
-											// 		room.name,
-											// 		true,
-											// 	),
-											// ).then(() => {
-											// 	dispatch(startListening(room.name))
-											// 	// history.push(`/room/${room.name}`);
-											// })
+
+											const user = getState().auth
+											if (user) {
+												trySendMessage(
+													`${user.displayName} created this room`,
+													roomRef.id,
+												)
+											}
 										})
 								)
 							})
@@ -114,23 +111,12 @@ export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {
 	}
 }
 
-export const showError = (message: string) => ({
-	type: 'ERROR_MESSAGE',
-	message,
-})
-
-export const updateMessages = (messages: any, roomId: string) => ({
-	type: types.UPDATE_MESSAGES,
-	messages,
-	roomId,
-})
-
 export const trySendMessage = (
 	text: string,
 	roomId: string,
 	status: boolean = false,
 ) => {
-	return (dispatch: any, getState: any) => {
+	return (_: any, getState: any) => {
 		const user = getState().auth
 		if (user) {
 			const uid = user.uid
@@ -146,10 +132,6 @@ export const trySendMessage = (
 	}
 }
 
-export const orderRoomsStartState = () => ({
-	type: 'ORDER_ROOMS_START_STATE',
-})
-
 export const availableRooms = (rooms: RoomItem[]) => ({
 	type: types.UPDATE_AVAILABLE_ROOMS,
 	rooms,
@@ -157,6 +139,11 @@ export const availableRooms = (rooms: RoomItem[]) => ({
 
 export const initSlacker = () => ({
 	type: types.INIT_SLACKER_SAGA,
+})
+
+export const showError = (message: string) => ({
+	type: 'ERROR_MESSAGE',
+	message,
 })
 
 export const clearState = {
@@ -169,61 +156,6 @@ export const leaveRoom = (roomName: string, userId: string) => ({
 	userId,
 })
 
-export const clearUnread = (
-	roomName: string,
-	uid: string,
-	time: any,
-	unread: number,
-) => ({
-	type: 'CLEAR_UNREAD',
-	roomName,
-	uid,
-	time,
-	unread,
-})
-
-export const setUnread = (
-	roomName: string,
-	uid: string,
-	time: any,
-	unread: number,
-) => {
-	return (dispatch: any) => {
-		dispatch(clearUnread(roomName, uid, time, unread))
-	}
-}
-
-// export const startClearUnread = (roomName: string) => {
-// 	return (dispatch: any, getState: any) => {
-// 		// let time = moment().endOf("month");
-// 		const uid = getState().auth.uid
-// 		if (uid) {
-// 			const time = moment().format()
-// 			return database
-// 				.ref(`rooms/${roomName}/people/${uid}`)
-// 				.update({
-// 					unread: 0,
-// 					lastRead: time,
-// 				})
-// 				.then(() => {
-// 					dispatch(clearUnread(roomName, uid, time, 0))
-// 				})
-// 		}
-// 	}
-// }
-
-export const onLeft = (roomName: string, personID: string) => ({
-	type: 'ON_LEFT',
-	roomName,
-	personID,
-})
-
-export const onJoined = (roomName: string, person: any) => ({
-	type: 'ON_JOINED',
-	roomName,
-	person,
-})
-
 export const syncMessages = (messagesSnapshot: any, roomId: string) => {
 	const messages: any[] = []
 	messagesSnapshot.forEach((doc: any) => {
@@ -233,3 +165,9 @@ export const syncMessages = (messagesSnapshot: any, roomId: string) => {
 	messages.sort(byCreatedAt)
 	return updateMessages(messages, roomId)
 }
+
+export const updateMessages = (messages: any, roomId: string) => ({
+	type: types.UPDATE_MESSAGES,
+	messages,
+	roomId,
+})
