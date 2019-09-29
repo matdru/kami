@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import Conversation from '../components/Conversation'
 import Room from '../components/Room'
 
-import { trySendMessage } from '../actions/rooms'
+import { trySendMessage, tryFetchMoreMessages } from '../actions/rooms'
 import getProps from '../selectors/room'
 
 interface State {
@@ -18,6 +18,7 @@ interface Props {
 	isLoading: boolean
 	messages: Message[]
 	trySendMessage: (text: string, roomId: string, status?: boolean) => void
+	tryFetchMoreMessages: (roomId: string) => void
 }
 
 class RoomContainer extends Component<Props, State> {
@@ -85,8 +86,10 @@ class RoomContainer extends Component<Props, State> {
 	}
 
 	handleLoadMoreVisibilityChange = (isVisible: any) => {
-		if (isVisible && this.state.loadMoreVisible === false) {
+		const { room } = this.props
+		if (isVisible && this.state.loadMoreVisible === false && room) {
 			console.log('load more messages')
+			this.props.tryFetchMoreMessages(room.id)
 		}
 
 		this.setState({
@@ -115,5 +118,5 @@ const mapStateToProps = (state: StoreState, ownProps: any) =>
 	getProps(state, ownProps)
 export default connect(
 	mapStateToProps,
-	{ trySendMessage },
+	{ trySendMessage, tryFetchMoreMessages },
 )(RoomContainer)

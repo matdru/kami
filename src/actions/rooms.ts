@@ -132,6 +132,11 @@ export const trySendMessage = (
 	}
 }
 
+export const tryFetchMoreMessages = (roomId: string) => ({
+	type: types.FETCH_MORE_MESSAGES,
+	roomId
+})
+
 export const availableRooms = (rooms: RoomItem[]) => ({
 	type: types.UPDATE_AVAILABLE_ROOMS,
 	rooms,
