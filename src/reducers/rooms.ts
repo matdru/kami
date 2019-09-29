@@ -1,4 +1,5 @@
 import * as types from '../constants/ActionTypes'
+import { Reducer } from 'redux'
 
 interface RoomsState {
 	active: {
@@ -14,17 +15,26 @@ const defaultState: RoomsState = {
 	available: {},
 }
 
-export default (state: RoomsState = defaultState, action: any) => {
+const roomReducer: Reducer<RoomsState> = (
+	state: RoomsState = defaultState,
+	action: any,
+): RoomsState => {
 	switch (action.type) {
 		case types.UPDATE_ROOM:
 			return {
 				...state,
-				active: { ...state.active, [action.room.id]: action.room },
+				active: {
+					...state.active,
+					[action.room.id]: { ...state.active[action.room.id], ...action.room },
+				},
 			}
 		case types.ACTIVE_ROOM:
 			return {
 				...state,
-				active: { ...state.active, [action.room.id]: action.room },
+				active: {
+					...state.active,
+					[action.room.id]: { ...state.active[action.room.id], ...action.room },
+				},
 			}
 
 		case types.UPDATE_AVAILABLE_ROOMS:
@@ -64,13 +74,7 @@ export default (state: RoomsState = defaultState, action: any) => {
 						...state.active[action.roomId],
 						messages: {
 							...state.active[action.roomId].messages,
-							...action.messages.reduce(
-								(acc: any, message: Message) => ({
-									...acc,
-									[message.id]: message,
-								}),
-								{},
-							),
+							...action.messages,
 						},
 					},
 				},
@@ -79,3 +83,5 @@ export default (state: RoomsState = defaultState, action: any) => {
 			return state
 	}
 }
+
+export default roomReducer

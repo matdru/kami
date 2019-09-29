@@ -10,8 +10,8 @@ const byCreatedAt = function(a: any, b: any) {
 
 export interface RoomData {
 	id?: string
-	name: string
-	people: any
+	name?: string
+	people?: any
 	messages?: any
 	messageCount?: number
 	canFetchMore?: boolean
@@ -134,7 +134,7 @@ export const trySendMessage = (
 
 export const tryFetchMoreMessages = (roomId: string) => ({
 	type: types.FETCH_MORE_MESSAGES,
-	roomId
+	roomId,
 })
 
 export const availableRooms = (rooms: RoomItem[]) => ({
@@ -162,16 +162,15 @@ export const leaveRoom = (roomName: string, userId: string) => ({
 })
 
 export const syncMessages = (messagesSnapshot: any, roomId: string) => {
-	const messages: any[] = []
+	const messages: Messages = {}
 	messagesSnapshot.forEach((doc: any) => {
-		messages.push({ id: doc.id, ...doc.data() })
+		messages[doc.id] = { id: doc.id, ...doc.data() }
 	})
 
-	messages.sort(byCreatedAt)
 	return updateMessages(messages, roomId)
 }
 
-export const updateMessages = (messages: any, roomId: string) => ({
+export const updateMessages = (messages: Messages, roomId: string) => ({
 	type: types.UPDATE_MESSAGES,
 	messages,
 	roomId,

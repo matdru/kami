@@ -14,7 +14,7 @@ const getRoomMessages = (state: StoreState, ownProps: any) => {
 	return room ? Object.values(room.messages).sort(byCreatedAt) : []
 }
 
-export const makeGetEarliestMessageForRoomId = (roomId: string) => (
+export const getEarliestMessageForRoomId = (roomId: string) => (
 	state: StoreState,
 ) => {
 	const room = state.rooms.active[roomId]

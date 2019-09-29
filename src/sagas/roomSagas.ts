@@ -2,9 +2,14 @@ import { put, select, takeEvery, call, fork } from 'redux-saga/effects'
 import { AnyAction } from 'redux'
 import database, { rsf } from '../firebase/firebase'
 import * as types from '../constants/ActionTypes'
-import { showError, updateRoom, syncMessages } from '../actions/rooms'
+import {
+	showError,
+	updateRoom,
+	syncMessages,
+	updateMessages,
+} from '../actions/rooms'
 import { CollectionReference, QuerySnapshot } from '@firebase/firestore-types'
-import { makeGetEarliestMessageForRoomId } from '../selectors/room'
+import { getEarliestMessageForRoomId } from '../selectors/room'
 
 export function* updateRoomPresences() {
 	const auth = yield select(state => state.auth)
@@ -132,14 +137,16 @@ export function* fetchRoom(roomId: string) {
 		// get room's messages first page
 		const messages = yield call(fetchMessages, roomRef)
 
+		const canFetchMore = Object.keys(messages).length === 35
+
 		yield put(
 			updateRoom({
 				id: roomRef.id,
 				name: room ? room.name : 'Error',
 				people,
 				messages,
-				messageCount: messages.length,
-				canFetchMore: messages.length === 35,
+				// messageCount: messages.length,
+				canFetchMore,
 			}),
 		)
 
@@ -171,17 +178,24 @@ export function* fetchMoreMessages(action: AnyAction) {
 
 	if (roomDoc.exists) {
 		// find oldest message
-		const getEarliestMessageInRoom = makeGetEarliestMessageForRoomId(roomId)
-		const earliestMessage = yield select(getEarliestMessageInRoom)
+		const earliestMessage = yield select(getEarliestMessageForRoomId(roomId))
 
 		console.log({ earliestMessage })
 
-		// fetch next page after that message
+		const messages = yield call(
+			fetchMessages,
+			roomRef,
+			earliestMessage.createdAt,
+		)
+
+		console.log({ messages })
+
+		yield put(updateMessages(messages, roomId))
 	}
 }
 
 function* fetchMoreMessagesListener() {
-	yield takeEvery(types.FETCH_MESSAGES_REQUEST, fetchMoreMessages)
+	yield takeEvery(types.FETCH_MORE_MESSAGES, fetchMoreMessages)
 }
 
 function* joinRoomListener() {

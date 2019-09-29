@@ -18,6 +18,10 @@ interface Person {
 	displayName?: string
 }
 
+interface Messages {
+	[key: string]: Message
+}
+
 interface Message {
 	id: string
 	createdAt: Date
