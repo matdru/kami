@@ -190,7 +190,11 @@ export function* fetchMoreMessages(action: AnyAction) {
 
 		console.log({ messages })
 
-		yield put(updateMessages(messages, roomId))
+		const canFetchMore = Object.keys(messages).length === 35
+
+		console.log({ canFetchMore })
+
+		yield put(updateMessages(messages, roomId, canFetchMore))
 	}
 }
 

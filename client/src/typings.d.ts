@@ -43,6 +43,7 @@ interface RoomItem {
 	avatarUrl?: string
 	people: Person[]
 	messages: Message[]
+	canFetchMore: boolean
 }
 
 interface Rooms {

@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Button } from 'antd'
-import VsibilitySensor from 'react-visibility-sensor'
+import VisibilitySensor from 'react-visibility-sensor'
 
 import Message from './Message'
 import ChatInput from './ChatInput'
@@ -40,6 +40,7 @@ interface Props {
 	room: RoomItem | undefined
 	messages: Message[]
 	onLoadMoreVisibilityChange: (isVisible: boolean) => void
+	onMessagesScroll: (arg: any) => void
 	getMessagesRef: (ref: any) => void
 	getBottomAnchorRef: (ref: any) => void
 }
@@ -49,15 +50,18 @@ const Conversation = ({
 	messages,
 	getMessagesRef,
 	getBottomAnchorRef,
+	onMessagesScroll,
 	onLoadMoreVisibilityChange,
 }: Props) => (
 	<ChatWrapper>
-		<Messages ref={getMessagesRef}>
-			<TopAnchor>
-				<VsibilitySensor onChange={onLoadMoreVisibilityChange}>
-					<Button>Load more</Button>
-				</VsibilitySensor>
-			</TopAnchor>
+		<Messages onScroll={onMessagesScroll} ref={getMessagesRef}>
+			{!!room && room.canFetchMore && (
+				<TopAnchor>
+					<VisibilitySensor onChange={onLoadMoreVisibilityChange}>
+						<Button>Load more</Button>
+					</VisibilitySensor>
+				</TopAnchor>
+			)}
 			{messages.map((message, idx) => (
 				<Message
 					isConsecutive={

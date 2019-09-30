@@ -1,6 +1,8 @@
 import { createSelector } from 'reselect'
 import { byCreatedAt } from '../utils/misc'
 
+import { SelectorProps } from '../containers/Room'
+
 const getAuth = (state: StoreState) => state.auth
 
 const getRoom = (state: StoreState, ownProps: any) => {
@@ -26,12 +28,12 @@ const getProps = createSelector(
 	getRoom,
 	getRoomMessages,
 	getAuth,
-	(room, messages, auth) => {
+	(room, messages, auth): SelectorProps => {
 		return {
 			auth,
 			room,
 			messages,
-			isLoading: !room,
+			isLoading: !room
 		}
 	},
 )

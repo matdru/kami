@@ -152,8 +152,13 @@ export const syncMessages = (messagesSnapshot: any, roomId: string) => {
 	return updateMessages(messages, roomId)
 }
 
-export const updateMessages = (messages: any, roomId: string) => ({
+export const updateMessages = (
+	messages: any,
+	roomId: string,
+	canFetchMore: boolean = true,
+) => ({
 	type: types.UPDATE_MESSAGES,
 	messages,
+	canFetchMore,
 	roomId,
 })

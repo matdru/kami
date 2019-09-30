@@ -76,6 +76,7 @@ const roomReducer: Reducer<RoomsState> = (
 							...state.active[action.roomId].messages,
 							...action.messages,
 						},
+						canFetchMore: action.canFetchMore,
 					},
 				},
 			}

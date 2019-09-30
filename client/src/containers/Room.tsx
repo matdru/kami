@@ -12,19 +12,28 @@ interface State {
 	loadMoreVisible: boolean | null
 }
 
-interface Props {
+export interface SelectorProps {
 	auth: Auth
 	room: RoomItem | undefined
-	match: any
-	isLoading: boolean
 	messages: Message[]
+	isLoading: boolean
+}
+
+interface DispatchProps {
 	trySendMessage: (text: string, roomId: string, status?: boolean) => void
 	tryFetchMoreMessages: (roomId: string) => void
 }
 
+interface OwnProps {
+	match: any
+}
+
+type Props = SelectorProps & DispatchProps & OwnProps
+
 class RoomContainer extends Component<Props, State> {
 	messagesEnd: any = null
 	messagesContainer: HTMLElement | null = null
+	scrollData: any = null
 
 	constructor(props: Props) {
 		super(props)
@@ -61,22 +70,59 @@ class RoomContainer extends Component<Props, State> {
 		) {
 			const previousLastMessage = prevProps.messages.slice(-1)[0]
 			const currentLastMessage = this.props.messages.slice(-1)[0]
-			if (
-				previousLastMessage.id !== currentLastMessage.id &&
-				!!currentLastMessage &&
-				currentLastMessage.sender.uid === this.props.auth.uid
-			) {
-				// last message was ours, scroll to the bottom
-				this.scrollToBottom()
-			} else if (this.messagesContainer) {
-				// last message is not ours, lets check scroll
-				const { scrollHeight, scrollTop, clientHeight } = this.messagesContainer
-
-				// if our scroll is around bottom 2 messages, scroll to bottom pls
-				if (Math.abs(clientHeight - (scrollHeight - scrollTop - 45)) < 45) {
+			// if last message is different
+			if (previousLastMessage.id !== currentLastMessage.id) {
+				if (
+					!!currentLastMessage &&
+					currentLastMessage.sender.uid === this.props.auth.uid
+				) {
+					// last message was ours, scroll to the bottom
 					this.scrollToBottom()
+				} else if (this.messagesContainer) {
+					// last message is not ours, lets check scroll
+					const {
+						scrollHeight,
+						scrollTop,
+						clientHeight,
+					} = this.messagesContainer
+
+					// if our scroll is around bottom 2 messages, scroll to bottom pls
+					if (Math.abs(clientHeight - (scrollHeight - scrollTop - 45)) < 45) {
+						this.scrollToBottom()
+					}
+				}
+			} else {
+				// if we loaded earlier messages we need to restore scroll position
+				if (this.scrollData && this.messagesContainer) {
+					const { scrollHeight, scrollTop, clientHeight } = this.scrollData
+					const scrollBottom = scrollHeight - clientHeight - scrollTop
+					if (scrollBottom > 0) {
+						const updatedScrollHeight = this.messagesContainer.scrollHeight
+						const updatedClientHeight = this.messagesContainer.clientHeight
+						const calculatedScrollTop =
+							updatedScrollHeight - updatedClientHeight - scrollBottom
+
+						this.messagesContainer.scrollTo({ top: calculatedScrollTop })
+					}
 				}
 			}
+		}
+	}
+
+	getMessagesRef = (ref: any) => {
+		this.messagesContainer = ref
+	}
+
+	handleMessagesScroll = (e: any) => {
+		let element = e.target
+		this.scrollData = {
+			scrollHeight: element.scrollHeight,
+			scrollTop: element.scrollTop,
+			clientHeight: element.clientHeight,
+		}
+		if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+			// do something at end of scroll
+			console.log(this.scrollData)
 		}
 	}
 
@@ -107,7 +153,8 @@ class RoomContainer extends Component<Props, State> {
 					room={room}
 					messages={messages}
 					onLoadMoreVisibilityChange={this.handleLoadMoreVisibilityChange}
-					getMessagesRef={ref => (this.messagesContainer = ref)}
+					onMessagesScroll={this.handleMessagesScroll}
+					getMessagesRef={this.getMessagesRef}
 					getBottomAnchorRef={ref => (this.messagesEnd = ref)}
 				/>
 			</Room>
@@ -115,8 +162,9 @@ class RoomContainer extends Component<Props, State> {
 	}
 }
 
-const mapStateToProps = (state: StoreState, ownProps: any) =>
+const mapStateToProps = (state: StoreState, ownProps: any): SelectorProps =>
 	getProps(state, ownProps)
+
 export default connect(
 	mapStateToProps,
 	{ trySendMessage, tryFetchMoreMessages },
