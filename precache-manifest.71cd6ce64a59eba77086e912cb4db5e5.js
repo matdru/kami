@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "c0aed455203da7cf5e5c036496c71f24",
+    "revision": "440fe4b02434e30921f868d95da9e455",
     "url": "/kami/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/kami/static/css/2.7a1db334.chunk.css"
   },
   {
-    "revision": "1e1006264fca189a2166",
+    "revision": "4fc207f5e01a9e72ea58",
     "url": "/kami/static/css/main.bcf5a46d.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/kami/static/js/2.19d02627.chunk.js"
   },
   {
-    "revision": "1e1006264fca189a2166",
-    "url": "/kami/static/js/main.cc8e3adb.chunk.js"
+    "revision": "4fc207f5e01a9e72ea58",
+    "url": "/kami/static/js/main.cb4998a9.chunk.js"
   },
   {
     "revision": "771671db240c41179c03",
