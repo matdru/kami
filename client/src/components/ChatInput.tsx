@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
 
-import { trySendMessage } from '../actions/rooms'
+import { trySendMessage } from '../actions/messages'
 
 const InputForm = styled.form`
 	height: 44px;

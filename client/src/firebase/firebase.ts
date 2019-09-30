@@ -12,6 +12,7 @@ const config = {
 const firebaseApp = firebase.initializeApp(config)
 const rsf = new ReduxSagaFirebase(firebaseApp)
 const database = firebase.firestore()
+const functions = firebaseApp.functions('europe-west1')
 const githubAuthProvider = new firebase.auth.GithubAuthProvider()
 const googleAuthProvider = new firebase.auth.GoogleAuthProvider()
 
@@ -19,6 +20,7 @@ const auth = firebase.auth()
 
 export {
 	firebase,
+	functions,
 	rsf,
 	auth,
 	githubAuthProvider,

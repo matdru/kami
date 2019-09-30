@@ -1,6 +1,7 @@
 import database from '../firebase/firebase'
-import moment from 'moment'
 // import { ipcRenderer } from 'electron';
+
+import { trySendMessage } from './messages'
 
 import * as types from '../constants/ActionTypes'
 
@@ -95,9 +96,11 @@ export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {
 
 											const user = getState().auth
 											if (user) {
-												trySendMessage(
-													`${user.displayName} created this room`,
-													roomRef.id,
+												dispatch(
+													trySendMessage(
+														`${user.displayName} created this room`,
+														roomRef.id,
+													),
 												)
 											}
 										})
@@ -108,28 +111,6 @@ export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {
 					return showCreateError('Room name not available!')
 				}
 			})
-	}
-}
-
-export const trySendMessage = (
-	text: string,
-	roomId: string,
-	status: boolean = false,
-) => {
-	return (_: any, getState: any) => {
-		const user = getState().auth
-		if (user) {
-			const uid = user.uid
-			const displayName = user.displayName
-			const message = {
-				sender: { uid, displayName },
-				text,
-				// TODO move to functions
-				createdAt: moment.utc().format(),
-				status,
-			}
-			return database.collection(`rooms/${roomId}/messages`).add(message)
-		}
 	}
 }
 
@@ -162,26 +143,11 @@ export const leaveRoom = (roomName: string, userId: string) => ({
 	userId,
 })
 
-export const syncMessagesOld = (messagesSnapshot: any, roomId: string) => {
-	console.log('elo123?')
-	const messages: Messages[] = []
-	messagesSnapshot.forEach((doc: any) => {
-		messages.push({ id: doc.id, ...doc.data() })
-	})
-
-	console.log({ messages })
-
-	return updateMessages(messages, roomId)
-}
-
 export const syncMessages = (messagesSnapshot: any, roomId: string) => {
-	console.log('elo?')
 	const messages: Messages = {}
 	messagesSnapshot.forEach((doc: any) => {
 		messages[doc.id] = { id: doc.id, ...doc.data() }
 	})
-
-	console.log({ messages })
 
 	return updateMessages(messages, roomId)
 }

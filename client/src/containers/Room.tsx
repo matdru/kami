@@ -4,7 +4,8 @@ import { connect } from 'react-redux'
 import Conversation from '../components/Conversation'
 import Room from '../components/Room'
 
-import { trySendMessage, tryFetchMoreMessages } from '../actions/rooms'
+import { tryFetchMoreMessages } from '../actions/rooms'
+import { trySendMessage } from '../actions/messages'
 import getProps from '../selectors/room'
 
 interface State {
