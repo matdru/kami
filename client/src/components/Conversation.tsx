@@ -3,8 +3,8 @@ import styled from 'styled-components'
 import { Button } from 'antd'
 import VsibilitySensor from 'react-visibility-sensor'
 
-import Message from '../components/Message'
-import ChatInput from '../components/ChatInput'
+import Message from './Message'
+import ChatInput from './ChatInput'
 
 const ChatWrapper = styled.div`
 	/* height: 100%; */

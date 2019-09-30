@@ -4,9 +4,9 @@ import moment from 'moment'
 
 import * as types from '../constants/ActionTypes'
 
-const byCreatedAt = function(a: any, b: any) {
-	return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-}
+// const byCreatedAt = function(a: any, b: any) {
+// 	return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+// }
 
 export interface RoomData {
 	id?: string
@@ -124,7 +124,8 @@ export const trySendMessage = (
 			const message = {
 				sender: { uid, displayName },
 				text,
-				createdAt: moment().format(),
+				// TODO move to functions
+				createdAt: moment.utc().format(),
 				status,
 			}
 			return database.collection(`rooms/${roomId}/messages`).add(message)
@@ -161,16 +162,31 @@ export const leaveRoom = (roomName: string, userId: string) => ({
 	userId,
 })
 
+export const syncMessagesOld = (messagesSnapshot: any, roomId: string) => {
+	console.log('elo123?')
+	const messages: Messages[] = []
+	messagesSnapshot.forEach((doc: any) => {
+		messages.push({ id: doc.id, ...doc.data() })
+	})
+
+	console.log({ messages })
+
+	return updateMessages(messages, roomId)
+}
+
 export const syncMessages = (messagesSnapshot: any, roomId: string) => {
+	console.log('elo?')
 	const messages: Messages = {}
 	messagesSnapshot.forEach((doc: any) => {
 		messages[doc.id] = { id: doc.id, ...doc.data() }
 	})
 
+	console.log({ messages })
+
 	return updateMessages(messages, roomId)
 }
 
-export const updateMessages = (messages: Messages, roomId: string) => ({
+export const updateMessages = (messages: any, roomId: string) => ({
 	type: types.UPDATE_MESSAGES,
 	messages,
 	roomId,

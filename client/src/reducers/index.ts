@@ -1,6 +1,6 @@
-import authReducer from '../reducers/auth'
-import roomsReducer from '../reducers/rooms'
-import redirectReducer from '../reducers/redirect'
+import authReducer from './auth'
+import roomsReducer from './rooms'
+import redirectReducer from './redirect'
 import { combineReducers } from 'redux'
 
 const reducers = combineReducers({
