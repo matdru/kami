@@ -113,16 +113,15 @@ class RoomContainer extends Component<Props, State> {
 		this.messagesContainer = ref
 	}
 
+	// TODO improve typings
 	handleMessagesScroll = (e: any) => {
-		let element = e.target
-		this.scrollData = {
-			scrollHeight: element.scrollHeight,
-			scrollTop: element.scrollTop,
-			clientHeight: element.clientHeight,
-		}
-		if (element.scrollHeight - element.scrollTop === element.clientHeight) {
-			// do something at end of scroll
-			console.log(this.scrollData)
+		if (e && e.target) {
+			let element = e.target
+			this.scrollData = {
+				scrollHeight: element.scrollHeight,
+				scrollTop: element.scrollTop,
+				clientHeight: element.clientHeight,
+			}
 		}
 	}
 
