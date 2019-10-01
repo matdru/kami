@@ -20,7 +20,11 @@ const roomReducer: Reducer<RoomsState> = (
 	action: any,
 ): RoomsState => {
 	switch (action.type) {
-		case types.UPDATE_ROOM:
+		case types.UPDATE_ROOM: {
+			console.log({
+				oldState: { ...state.active[action.room.id] },
+				newState: { ...state.active[action.room.id], ...action.room },
+			})
 			return {
 				...state,
 				active: {
@@ -28,6 +32,7 @@ const roomReducer: Reducer<RoomsState> = (
 					[action.room.id]: { ...state.active[action.room.id], ...action.room },
 				},
 			}
+		}
 		case types.ACTIVE_ROOM:
 			return {
 				...state,

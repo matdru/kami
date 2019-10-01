@@ -142,7 +142,7 @@ export function* fetchRoom(roomId: string) {
 		yield put(
 			updateRoom({
 				id: roomRef.id,
-				name: room ? room.name : 'Error',
+				name: room.name || '-',
 				people,
 				messages,
 				// messageCount: messages.length,
@@ -163,7 +163,6 @@ export function* subscribeToLastMessage(
 		.orderBy('createdAt', 'desc')
 		.limit(1) as CollectionReference
 
-	// TODO merge this with other messages to save on reads
 	yield fork(rsf.firestore.syncCollection, newestMessage, {
 		successActionCreator: (snapshot: any) => syncMessages(snapshot, roomRef.id),
 	})
@@ -177,10 +176,9 @@ export function* fetchMoreMessages(action: AnyAction) {
 	const roomDoc = yield call(rsf.firestore.getDocument, roomRef)
 
 	if (roomDoc.exists) {
+		yield put(updateRoom({ id: roomId, isFetchingMore: true }))
 		// find oldest message
 		const earliestMessage = yield select(getEarliestMessageForRoomId(roomId))
-
-		console.log({ earliestMessage })
 
 		const messages = yield call(
 			fetchMessages,
@@ -188,13 +186,10 @@ export function* fetchMoreMessages(action: AnyAction) {
 			earliestMessage.createdAt,
 		)
 
-		console.log({ messages })
-
 		const canFetchMore = Object.keys(messages).length === 35
 
-		console.log({ canFetchMore })
-
 		yield put(updateMessages(messages, roomId, canFetchMore))
+		yield put(updateRoom({ id: roomId, isFetchingMore: false }))
 	}
 }
 

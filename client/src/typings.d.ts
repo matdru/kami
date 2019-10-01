@@ -44,6 +44,7 @@ interface RoomItem {
 	people: Person[]
 	messages: Message[]
 	canFetchMore: boolean
+	isFetchingMore: boolean
 }
 
 interface Rooms {

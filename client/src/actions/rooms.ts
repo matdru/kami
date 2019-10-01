@@ -16,25 +16,12 @@ export interface RoomData {
 	messages?: any
 	messageCount?: number
 	canFetchMore?: boolean
+	isFetchingMore?: boolean
 }
 
-export const updateRoom = ({
-	id,
-	name,
-	people,
-	messages = [],
-	canFetchMore,
-	messageCount,
-}: RoomData) => ({
+export const updateRoom = (room: RoomData) => ({
 	type: types.UPDATE_ROOM,
-	room: {
-		id,
-		name,
-		people,
-		messages,
-		canFetchMore,
-		messageCount,
-	},
+	room,
 })
 
 export const activeRoom = (activeRoom: RoomItem) => ({
