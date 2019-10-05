@@ -130,7 +130,7 @@ export const leaveRoom = (roomName: string, userId: string) => ({
 	userId,
 })
 
-export const syncMessages = (messagesSnapshot: any, roomId: string) => {
+export const updateMessagesFromSnapshot = (messagesSnapshot: any, roomId: string) => {
 	const messages: Messages = {}
 	messagesSnapshot.forEach((doc: any) => {
 		messages[doc.id] = { id: doc.id, ...doc.data() }

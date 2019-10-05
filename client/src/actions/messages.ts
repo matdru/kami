@@ -1,7 +1,6 @@
 import { functions } from '../firebase/firebase'
 
 // get function handler
-const sendMessage = functions.httpsCallable('sendMessage')
 export const trySendMessage = (
 	text: string,
 	roomId: string,
@@ -14,7 +13,7 @@ export const trySendMessage = (
 				text,
 				roomId,
 			}
-			return sendMessage(message)
+			return functions.sendMessage(message)
 		}
 	}
 }

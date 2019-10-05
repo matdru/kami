@@ -2,7 +2,7 @@ import { put, select, takeLatest, fork, call } from 'redux-saga/effects'
 import database, { firebase, rsf } from '../firebase/firebase'
 import { availableRooms } from '../actions/rooms'
 import * as types from '../constants/ActionTypes'
-import { fetchRoom } from './roomSagas'
+import { fetchRoom } from './rooms'
 
 // worker Saga
 function* initSlacker(action: any) {

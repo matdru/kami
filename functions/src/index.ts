@@ -2,76 +2,24 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as moment from "moment";
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-export const helloWorld = functions
-  .region("europe-west1")
-  .https.onRequest((request, response) => {
-    response.send("Hello from Firebase!");
-  });
+import { genericErrorHandler } from "./helpers";
 
 // The Firebase Admin SDK to access the Firebase Realtime Database.
 admin.initializeApp();
 
-export const addMessage = functions
-  .region("europe-west1")
-  .https.onRequest(async (req, res) => {
-    // Grab the text parameter.
-    const qBody = req.query.body;
-    const roomId = req.query.text;
-
-    // TODO create auth helper
-    const idToken = req.headers.authorization;
-    if (idToken) {
-      admin
-        .auth()
-        .verifyIdToken(idToken)
-        .then(function(decodedToken) {
-          const uid = decodedToken.uid;
-          // ...
-          res.status(200).send({
-            uid,
-            qBody,
-            roomId
-          });
-        })
-        .catch(function() {
-          // Handle error
-          res.status(400).send("Invalid token");
-        });
-    } else {
-      res.status(400).send(`No auth token provided. -> ${idToken}`);
-    }
-
-    console.log(qBody);
-
-    res.send("Hello from Firebase!");
-
-    // Push the new message into the Realtime Database using the Firebase Admin SDK.
-    // const snapshot = await admin.firestore().collection(`rooms/${roomId}/messages`).add()
-
-    // Redirect with 303 SEE OTHER to the URL of the pushed object in the Firebase console.
-    // res.redirect(303, snapshot.ref.toString());
-  });
-
 export const sendMessage = functions
-  .region('europe-west2')
+  .region("europe-west1")
   .https.onCall((data, context) => {
     // Authentication / user information is automatically added to the request.
     if (context.auth) {
       const uid = context.auth.uid;
-			const name = context.auth.token.name || null;
-			const { text, roomId } = data
-      // const picture = context.auth.token.picture || null
-      // const email = context.auth.token.email || null
+      const name = context.auth.token.name || "Ninja";
+      const { text, roomId } = data;
 
       const message = {
         sender: { uid, displayName: name },
         text,
-        // TODO move to functions
         createdAt: moment.utc().format()
-        // status
       };
 
       return admin
@@ -91,6 +39,75 @@ export const sendMessage = functions
         "The function must be called " + "while authenticated."
       );
     }
+  });
 
-    throw new functions.https.HttpsError("unknown", "Something went wrong :(");
+export const joinRoom = functions
+  .region("europe-west1")
+  .https.onCall((data, context) => {
+    // check if authenticated
+    // TODO solve typescript
+    // checkAuth(context);
+    if (!context.auth) {
+      // Throwing an HttpsError so that the client gets the error details.
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called " + "while authenticated."
+      );
+    }
+
+    const uid = context.auth && context.auth.uid;
+    const name = context.auth.token.name || "Ninja";
+    const { roomId } = data;
+    console.log({ data })
+    const store = admin.firestore();
+
+    store
+      .doc(`rooms/${roomId}`)
+      .get()
+      .then(
+        snapshot => {
+          // TODO how can client and functions share definitions?
+          const room = { id: snapshot.id, ...snapshot.data() } as Room;
+
+          if (!room || !snapshot.exists) {
+            throw new functions.https.HttpsError(
+              "invalid-argument",
+              "This room doesn't exist"
+            );
+          }
+
+          if (room.people && room.people.find(person => person.id === uid)) {
+            // TODO figure out leaving and re-entering
+            throw new functions.https.HttpsError(
+              "already-exists",
+              "This room already has this user"
+            );
+          }
+
+          // add user to room
+          const user = {
+            name,
+            // photoURL: photoURL,
+            id: uid
+            // unread: 0,
+            // lastRead: 0
+          };
+
+          store
+            .doc(`rooms/${roomId}/people/${user.id}`)
+            .set(user)
+            .then(roomWriteResult => {
+              console.log(roomWriteResult)
+              store
+                .doc(`users/${user.id}/rooms/${roomId}`)
+                .set({ roomName: room.name })
+                .then(userWriteResult => {
+                  console.log(userWriteResult);
+                  return {};
+                }, genericErrorHandler);
+            }, genericErrorHandler);
+        },
+        // onRejected
+        genericErrorHandler
+      );
   });
