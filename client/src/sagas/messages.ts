@@ -54,8 +54,8 @@ export function* fetchMoreMessages(action: AnyAction) {
 
 		const canFetchMore = Object.keys(messages).length === 35
 
-		yield put(updateMessages(messages, roomId, canFetchMore))
-		yield put(updateRoom({ id: roomId, isFetchingMore: false }))
+		yield put(updateMessages(messages, roomId))
+		yield put(updateRoom({ id: roomId, isFetchingMore: false, canFetchMore }))
 	}
 }
 

@@ -2,7 +2,7 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as moment from "moment";
 
-import { genericErrorHandler } from "./helpers";
+import { genericErrorHandler, getAuth } from "./helpers";
 
 // The Firebase Admin SDK to access the Firebase Realtime Database.
 admin.initializeApp();
@@ -44,24 +44,14 @@ export const sendMessage = functions
 export const joinRoom = functions
   .region("europe-west1")
   .https.onCall((data, context) => {
-    // check if authenticated
-    // TODO solve typescript
-    // checkAuth(context);
-    if (!context.auth) {
-      // Throwing an HttpsError so that the client gets the error details.
-      throw new functions.https.HttpsError(
-        "failed-precondition",
-        "The function must be called " + "while authenticated."
-      );
-    }
+    const auth = getAuth(context);
 
-    const uid = context.auth && context.auth.uid;
-    const name = context.auth.token.name || "Ninja";
+    const uid = auth.uid;
+    const name = auth.token.name || "Ninja";
     const { roomId } = data;
-    console.log({ data })
     const store = admin.firestore();
 
-    store
+    return store
       .doc(`rooms/${roomId}`)
       .get()
       .then(
@@ -87,25 +77,87 @@ export const joinRoom = functions
           // add user to room
           const user = {
             name,
-            // photoURL: photoURL,
             id: uid
-            // unread: 0,
-            // lastRead: 0
           };
 
-          store
-            .doc(`rooms/${roomId}/people/${user.id}`)
-            .set(user)
-            .then(roomWriteResult => {
-              console.log(roomWriteResult)
-              store
-                .doc(`users/${user.id}/rooms/${roomId}`)
-                .set({ roomName: room.name })
-                .then(userWriteResult => {
-                  console.log(userWriteResult);
-                  return {};
-                }, genericErrorHandler);
-            }, genericErrorHandler);
+          const batch = store.batch();
+
+          batch.set(store.doc(`rooms/${roomId}/people/${user.id}`), user);
+
+          batch.set(store.doc(`users/${user.id}/rooms/${roomId}`), {
+            roomName: room.name
+          });
+
+          // console.log ( do i have to return this? pepoThink )
+          return batch.commit().then(writeResults => {
+            console.log({ writeResults });
+            return {};
+          }, genericErrorHandler);
+        },
+        // onRejected
+        genericErrorHandler
+      );
+  });
+
+export const leaveRoom = functions
+  .region("europe-west1")
+  .https.onCall((data, context) => {
+    const auth = getAuth(context);
+
+    const uid = auth.uid;
+    const { roomId } = data;
+    const store = admin.firestore();
+
+    return store
+      .doc(`rooms/${roomId}`)
+      .get()
+      .then(
+        snapshot => {
+          if (!snapshot.exists) {
+            throw new functions.https.HttpsError(
+              "invalid-argument",
+              "This room doesn't exist"
+            );
+          }
+
+          // TODO how can client and functions share definitions?
+          const room = { id: snapshot.id, ...snapshot.data() } as Room;
+
+          const exisitingUser =
+            room.people && room.people.find(person => person.id === uid);
+
+          if (!exisitingUser) {
+            // TODO figure out leaving and re-entering
+            throw new functions.https.HttpsError(
+              "not-found",
+              "This room doesnt have such user"
+            );
+          }
+
+          if (!exisitingUser.active) {
+            // TODO figure out leaving and re-entering
+            throw new functions.https.HttpsError(
+              "invalid-argument",
+              "User already left"
+            );
+          }
+
+          // add user to room
+          const user = {
+            id: uid,
+            active: false
+          };
+
+          const batch = store.batch();
+
+          batch.update(store.doc(`rooms/${roomId}/people/${user.id}`), user);
+
+          batch.delete(store.doc(`users/${user.id}/rooms/${roomId}`));
+
+          // console.log ( do i have to return this? pepoThink )
+          return batch.commit().then(() => {
+            return `${user.id} left ${roomId}`;
+          }, genericErrorHandler);
         },
         // onRejected
         genericErrorHandler

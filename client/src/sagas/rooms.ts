@@ -36,17 +36,25 @@ export function* updateRoomPresences() {
 
 export function* joinRoom(action: AnyAction) {
 	const { roomId } = action
-	
+
 	// call function that joins room
 	const response = yield call(functions.joinRoom, { roomId })
-	console.log({ response })
+
+	// fetch full room and subscribe
+	yield call(fetchRoom, roomId)
+}
+
+export function* leaveRoom(action: AnyAction) {
+	const { roomId } = action
+
+	// call function that joins room
+	const response = yield call(functions.joinRoom, { roomId })
 
 	// fetch full room and subscribe
 	// yield call(fetchRoom, roomId)
 }
 
 export function* fetchRoom(roomId: string) {
-	console.log('try fetch room ', roomId)
 	// fetch active room from firestore
 	const roomRef = database.collection('rooms').doc(roomId)
 	const roomDoc = yield call(rsf.firestore.getDocument, roomRef)

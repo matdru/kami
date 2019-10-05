@@ -14,6 +14,7 @@ export const trySendMessage = (
 				roomId,
 			}
 			return functions.sendMessage(message)
+			// TODO add optimistic ui here
 		}
 	}
 }

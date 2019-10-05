@@ -6,6 +6,7 @@ interface Person {
 	lastRead: number
 	unread: number
 	displayName?: string
+	active?: boolean
 }
 
 interface Messages {
