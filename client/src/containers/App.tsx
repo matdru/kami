@@ -113,14 +113,7 @@ class App extends Component<Props, State> {
 	render() {
 		return (
 			<Layout style={{ height: '100%' }}>
-				<Sider
-					style={{
-						overflow: 'auto',
-						height: '100vh',
-						position: 'fixed',
-						left: 0,
-					}}
-				>
+				<Sider collapsedWidth={0} breakpoint="lg">
 					<LogoWrap>
 						<Logo src="fox.png" />
 					</LogoWrap>
@@ -154,7 +147,7 @@ class App extends Component<Props, State> {
 						))}
 					</Menu>
 				</Sider>
-				<Layout style={{ marginLeft: 200, background: '#fff' }}>
+				<Layout style={{ background: '#fff' }}>
 					<Switch>
 						<Route path={'/r/:roomId'} component={RoomContainer} />
 						<Route path={'/'}>
