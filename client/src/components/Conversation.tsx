@@ -5,6 +5,7 @@ import VisibilitySensor from 'react-visibility-sensor'
 
 import Message from './Message'
 import ChatInput from './ChatInput'
+import LoadingSpinner from './LoadingSpinner'
 
 const ChatWrapper = styled.div`
 	/* height: 100%; */
@@ -55,11 +56,16 @@ const Conversation = ({
 }: Props) => (
 	<ChatWrapper>
 		<Messages onScroll={onMessagesScroll} ref={getMessagesRef}>
-			{!!room && room.canFetchMore && (
+			{!!room && room.canFetchMore && !room.isFetchingMore && (
 				<TopAnchor>
 					<VisibilitySensor onChange={onLoadMoreVisibilityChange}>
 						<Button>Load more</Button>
 					</VisibilitySensor>
+				</TopAnchor>
+			)}
+			{!!room && room.isFetchingMore && (
+				<TopAnchor>
+					<LoadingSpinner />
 				</TopAnchor>
 			)}
 			{messages.map((message, idx) => (
