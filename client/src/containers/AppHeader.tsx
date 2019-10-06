@@ -104,7 +104,11 @@ class AppHeader extends Component<Props, State> {
 				</Title>
 				{!!uid && (
 					<TopRightMenu>
-						<Dropdown overlay={menu} placement="bottomRight">
+						<Dropdown
+							overlay={menu}
+							trigger={['click']}
+							placement="bottomRight"
+						>
 							<Button
 								icon="setting"
 								shape="circle"
