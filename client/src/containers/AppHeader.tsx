@@ -1,12 +1,15 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
-import { Layout, Typography, Avatar, Button } from 'antd'
+import { Layout, Typography, Avatar, Button, Menu, Dropdown, Modal } from 'antd'
 
 import ProfileDialog from '../components/ProfileDialog'
+import { tryLeaveRoom } from '../actions/rooms'
 
 const { Header } = Layout
 const { Title } = Typography
+
+const { confirm } = Modal
 
 const AccountButton = styled.button`
 	background: none;
@@ -29,6 +32,7 @@ interface Props {
 	room?: RoomItem
 	uid?: string
 	photoURL?: string
+	tryLeaveRoom: (roomId: string) => void
 }
 
 interface State {
@@ -52,22 +56,37 @@ class AppHeader extends Component<Props, State> {
 		})
 	}
 
+	handleConfirmLeave = () => {
+		const { room } = this.props
+		if (room) {
+			const leaveHandler = () => this.props.tryLeaveRoom(room.id)
+			confirm({
+				title: 'Do you want to leave this room?',
+				content: this.props.room ? this.props.room.name : '-',
+				onOk() {
+					leaveHandler()
+				},
+				onCancel() {},
+			})
+		}
+	}
+
 	render() {
 		const { room, uid, photoURL } = this.props
 		// TODO plan what is in here
-		// const menu = (
-		// 	<Menu>
-		// 		<Menu.Item onClick={this.handleProfileOpen}>
-		// 			<a>Profile</a>
-		// 		</Menu.Item>
-		// 		{/* <Menu.Item>
-		// 			<a>2nd menu item</a>
-		// 		</Menu.Item>
-		// 		<Menu.Item>
-		// 			<a>3rd menu item</a>
-		// 		</Menu.Item> */}
-		// 	</Menu>
-		// )
+		const menu = (
+			<Menu>
+				<Menu.Item onClick={this.handleConfirmLeave}>
+					<a>Leave chat</a>
+				</Menu.Item>
+				{/* <Menu.Item>
+					<a>2nd menu item</a>
+				</Menu.Item>
+				<Menu.Item>
+					<a>3rd menu item</a>
+				</Menu.Item> */}
+			</Menu>
+		)
 		return (
 			<Header
 				style={{
@@ -85,7 +104,13 @@ class AppHeader extends Component<Props, State> {
 				</Title>
 				{!!uid && (
 					<TopRightMenu>
-						<Button icon="setting" shape="circle" style={{ paddingTop: 1, marginRight: 10 }} />
+						<Dropdown overlay={menu} placement="bottomRight">
+							<Button
+								icon="setting"
+								shape="circle"
+								style={{ paddingTop: 1, marginRight: 10 }}
+							/>
+						</Dropdown>
 
 						<AccountButton onClick={this.handleProfileOpen}>
 							<Avatar src={photoURL} size={35} shape="square" />
@@ -109,4 +134,7 @@ const mapStateToProps = (state: StoreState) => {
 	}
 }
 
-export default connect(mapStateToProps)(AppHeader)
+export default connect(
+	mapStateToProps,
+	{ tryLeaveRoom },
+)(AppHeader)

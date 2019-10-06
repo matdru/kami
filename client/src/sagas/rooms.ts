@@ -39,6 +39,7 @@ export function* joinRoom(action: AnyAction) {
 
 	// call function that joins room
 	const response = yield call(functions.joinRoom, { roomId })
+	console.log({ response })
 
 	// fetch full room and subscribe
 	yield call(fetchRoom, roomId)
@@ -47,8 +48,12 @@ export function* joinRoom(action: AnyAction) {
 export function* leaveRoom(action: AnyAction) {
 	const { roomId } = action
 
+	console.log('calling leave function...')
+
 	// call function that joins room
-	const response = yield call(functions.joinRoom, { roomId })
+	const response = yield call(functions.leaveRoom, { roomId })
+
+	console.log({ response })
 
 	// fetch full room and subscribe
 	// yield call(fetchRoom, roomId)
@@ -97,8 +102,16 @@ function* joinRoomListener() {
 	yield takeEvery(types.JOIN_ROOM_SAGA, joinRoom)
 }
 
+function* leaveRoomListener() {
+	yield takeEvery(types.LEAVE_ROOM_SAGA, leaveRoom)
+}
+
 function* updateRoomPresencesListener() {
 	yield takeEvery(types.UPDATE_ROOM_PRESENCES, updateRoomPresences)
 }
 
-export default [joinRoomListener(), updateRoomPresencesListener()]
+export default [
+	joinRoomListener(),
+	leaveRoomListener(),
+	updateRoomPresencesListener(),
+]

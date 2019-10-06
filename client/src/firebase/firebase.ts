@@ -21,7 +21,8 @@ const auth = firebase.auth()
 // functions
 const functions = {
 	sendMessage: functionsInstance.httpsCallable('sendMessage'),
-	joinRoom: functionsInstance.httpsCallable('joinRoom')
+	joinRoom: functionsInstance.httpsCallable('joinRoom'),
+	leaveRoom: functionsInstance.httpsCallable('leaveRoom')
 }
 
 export {

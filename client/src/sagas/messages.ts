@@ -74,7 +74,7 @@ export function* subscribeToLastMessage(
 }
 
 function* fetchMoreMessagesListener() {
-	yield takeEvery(types.FETCH_MORE_MESSAGES, fetchMoreMessages)
+	yield takeEvery(types.FETCH_MORE_MESSAGES_SAGA, fetchMoreMessages)
 }
 
 export default [

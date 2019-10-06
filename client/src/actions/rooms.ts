@@ -34,6 +34,11 @@ export const tryJoinRoom = (roomId: string) => ({
 	roomId,
 })
 
+export const tryLeaveRoom = (roomId: string) => ({
+	type: types.LEAVE_ROOM_SAGA,
+	roomId,
+})
+
 export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {
 	return (dispatch: any, getState: () => StoreState) => {
 		const room = {
@@ -101,8 +106,9 @@ export const tryCreateRoom = (roomData: RoomData, showCreateError: any) => {
 	}
 }
 
+// saga
 export const tryFetchMoreMessages = (roomId: string) => ({
-	type: types.FETCH_MORE_MESSAGES,
+	type: types.FETCH_MORE_MESSAGES_SAGA,
 	roomId,
 })
 
@@ -130,6 +136,7 @@ export const leaveRoom = (roomName: string, userId: string) => ({
 	userId,
 })
 
+// need this for listener saga
 export const updateMessagesFromSnapshot = (messagesSnapshot: any, roomId: string) => {
 	const messages: Messages = {}
 	messagesSnapshot.forEach((doc: any) => {
