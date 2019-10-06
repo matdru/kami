@@ -2,164 +2,158 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as moment from "moment";
 
-import { genericErrorHandler, getAuth } from "./helpers";
+import { getAuth } from "./helpers";
 
-// The Firebase Admin SDK to access the Firebase Realtime Database.
 admin.initializeApp();
+
+const firestore = admin.firestore();
 
 export const sendMessage = functions
   .region("europe-west1")
   .https.onCall((data, context) => {
-    // Authentication / user information is automatically added to the request.
-    if (context.auth) {
-      const uid = context.auth.uid;
-      const name = context.auth.token.name || "Ninja";
-      const { text, roomId } = data;
+    // require auth
+    const auth = getAuth(context);
 
-      const message = {
-        sender: { uid, displayName: name },
-        text,
-        createdAt: moment.utc().format()
-      };
+    const uid = auth.uid;
+    const name = auth.token.name || "Ninja";
+    const { text, roomId } = data;
 
-      return admin
-        .firestore()
-        .collection(`rooms/${roomId}/messages`)
-        .add(message)
-        .then(response => {
-          return response;
-        })
-        .catch(() => ({
-          error: "Error when inserting firestore :("
-        }));
-    } else {
-      // Throwing an HttpsError so that the client gets the error details.
-      throw new functions.https.HttpsError(
-        "failed-precondition",
-        "The function must be called " + "while authenticated."
-      );
-    }
+    const message = {
+      sender: { uid, displayName: name },
+      text,
+      createdAt: moment.utc().format()
+    };
+
+    return firestore
+      .collection(`rooms/${roomId}/messages`)
+      .add(message)
+      .then(response => {
+        return response;
+      })
+      .catch(() => ({
+        error: "Error when inserting firestore :("
+      }));
   });
 
 export const joinRoom = functions
   .region("europe-west1")
   .https.onCall((data, context) => {
+    // require auth
     const auth = getAuth(context);
 
     const uid = auth.uid;
     const name = auth.token.name || "Ninja";
     const { roomId } = data;
-    const store = admin.firestore();
 
-    return store
-      .doc(`rooms/${roomId}`)
-      .get()
-      .then(
-        snapshot => {
-          // TODO how can client and functions share definitions?
-          const room = { id: snapshot.id, ...snapshot.data() } as Room;
+    const roomRef = firestore.doc(`rooms/${roomId}`);
+    const roomMemberRef = firestore.doc(`rooms/${roomId}/people/${uid}`);
 
-          if (!room || !snapshot.exists) {
-            throw new functions.https.HttpsError(
-              "invalid-argument",
-              "This room doesn't exist"
-            );
+    return firestore.runTransaction(transaction => {
+      return transaction.get(roomRef).then(roomDoc => {
+        if (!roomDoc.exists) {
+          throw new functions.https.HttpsError(
+            "invalid-argument",
+            "This room doesn't exist"
+          );
+        }
+
+        const room = { id: roomDoc.id, ...roomDoc.data() } as Room;
+
+        return transaction.get(roomMemberRef).then(roomMemberDoc => {
+          if (roomMemberDoc.exists) {
+            const roomMember = {
+              id: roomMemberDoc.id,
+              ...roomMemberDoc.data()
+            } as Person;
+
+            if (roomMember.active) {
+              throw new functions.https.HttpsError(
+                "already-exists",
+                "This room already has this user"
+              );
+            }
           }
 
-          if (room.people && room.people.find(person => person.id === uid)) {
-            // TODO figure out leaving and re-entering
-            throw new functions.https.HttpsError(
-              "already-exists",
-              "This room already has this user"
-            );
-          }
-
-          // add user to room
+          // if we got here, insert user to room
           const user = {
+            id: uid,
             name,
-            id: uid
+            active: true
           };
 
-          const batch = store.batch();
+          // mark user as inactive
+          transaction.update(roomMemberRef, user);
 
-          batch.set(store.doc(`rooms/${roomId}/people/${user.id}`), user);
-
-          batch.set(store.doc(`users/${user.id}/rooms/${roomId}`), {
+          // remove from user's room list
+          transaction.set(firestore.doc(`users/${user.id}/rooms/${roomId}`), {
             roomName: room.name
           });
-
-          // console.log ( do i have to return this? pepoThink )
-          return batch.commit().then(writeResults => {
-            console.log({ writeResults });
-            return {};
-          }, genericErrorHandler);
-        },
-        // onRejected
-        genericErrorHandler
-      );
+        });
+      });
+    });
   });
 
 export const leaveRoom = functions
   .region("europe-west1")
   .https.onCall((data, context) => {
+    // require auth
     const auth = getAuth(context);
 
     const uid = auth.uid;
     const { roomId } = data;
-    const store = admin.firestore();
 
-    return store
-      .doc(`rooms/${roomId}`)
-      .get()
-      .then(
-        snapshot => {
-          if (!snapshot.exists) {
+    const roomRef = firestore.doc(`rooms/${roomId}`);
+    const roomMemberRef = firestore.doc(`rooms/${roomId}/people/${uid}`);
+
+    return firestore.runTransaction(transaction => {
+      return transaction
+        .get(roomRef)
+        .then(roomDoc => {
+          if (!roomDoc.exists) {
             throw new functions.https.HttpsError(
               "invalid-argument",
               "This room doesn't exist"
             );
           }
 
-          // TODO how can client and functions share definitions?
-          const room = { id: snapshot.id, ...snapshot.data() } as Room;
+          return transaction.get(roomMemberRef).then(roomMemberDoc => {
+            if (!roomMemberDoc.exists) {
+              throw new functions.https.HttpsError(
+                "not-found",
+                "This room doesnt have such user"
+              );
+            }
 
-          const exisitingUser =
-            room.people && room.people.find(person => person.id === uid);
+            const member = {
+              id: roomMemberDoc.id,
+              ...roomMemberDoc.data()
+            } as Person;
 
-          if (!exisitingUser) {
-            // TODO figure out leaving and re-entering
-            throw new functions.https.HttpsError(
-              "not-found",
-              "This room doesnt have such user"
+            // TODO figure out this flag
+            if (member.active === false) {
+              // TODO figure out leaving and re-entering
+              throw new functions.https.HttpsError(
+                "invalid-argument",
+                "User already left"
+              );
+            }
+
+            const user = {
+              id: uid,
+              active: false
+            };
+
+            // mark user as inactive
+            transaction.update(roomMemberRef, user);
+
+            // remove from user's room list
+            transaction.delete(
+              firestore.doc(`users/${user.id}/rooms/${roomId}`)
             );
-          }
-
-          if (!exisitingUser.active) {
-            // TODO figure out leaving and re-entering
-            throw new functions.https.HttpsError(
-              "invalid-argument",
-              "User already left"
-            );
-          }
-
-          // add user to room
-          const user = {
-            id: uid,
-            active: false
-          };
-
-          const batch = store.batch();
-
-          batch.update(store.doc(`rooms/${roomId}/people/${user.id}`), user);
-
-          batch.delete(store.doc(`users/${user.id}/rooms/${roomId}`));
-
-          // console.log ( do i have to return this? pepoThink )
-          return batch.commit().then(() => {
-            return `${user.id} left ${roomId}`;
-          }, genericErrorHandler);
-        },
-        // onRejected
-        genericErrorHandler
-      );
+          });
+        })
+        .then(() => {
+          console.log("Transaction complete -> user removed from room");
+        });
+    });
   });
