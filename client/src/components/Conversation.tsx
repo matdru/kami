@@ -74,7 +74,7 @@ const Conversation = ({
 						!!messages[idx - 1] &&
 						messages[idx - 1].sender.uid === message.sender.uid
 					}
-					name={message.sender.displayName || ''}
+					name={message.sender.displayName || 'Ninja'}
 					key={message.id}
 				>
 					{message.text}
