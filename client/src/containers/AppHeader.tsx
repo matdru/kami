@@ -83,6 +83,7 @@ class AppHeader extends Component<Props, State> {
 	render() {
 		const { room, uid, photoURL } = this.props
 		// TODO plan what is in here
+		// TODO 2 -> style a tags with buttons instead
 		const menu = (
 			<Menu>
 				<Menu.Item onClick={this.handleConfirmLeave}>
