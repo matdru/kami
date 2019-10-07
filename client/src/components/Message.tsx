@@ -33,12 +33,14 @@ const MessageHeader = styled.div`
 
 interface Props {
 	name: string
+	photoURL?: string
 	isConsecutive?: boolean
 }
 
 const Message: FunctionComponent<Props> = ({
 	children,
 	name,
+	photoURL,
 	isConsecutive,
 }) => {
 	if (isConsecutive) {
@@ -53,7 +55,7 @@ const Message: FunctionComponent<Props> = ({
 	return (
 		<MessageLayout>
 			<LeftPanel>
-				<Avatar size={35} shape="square" icon="user" />
+				<Avatar src={photoURL} size={35} shape="square" icon="user" />
 			</LeftPanel>
 			<RightPanel>
 				<MessageHeader>{name}</MessageHeader>

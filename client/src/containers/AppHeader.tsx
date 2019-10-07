@@ -5,6 +5,7 @@ import { Layout, Typography, Avatar, Button, Menu, Dropdown, Modal } from 'antd'
 
 import ProfileDialog from '../components/ProfileDialog'
 import { tryLeaveRoom } from '../actions/rooms'
+import { getRoomUsers } from '../actions/users'
 
 const { Header } = Layout
 const { Title } = Typography
@@ -33,6 +34,7 @@ interface Props {
 	uid?: string
 	photoURL?: string
 	tryLeaveRoom: (roomId: string) => void
+	getRoomUsers: (roomId: string) => void
 }
 
 interface State {
@@ -54,6 +56,13 @@ class AppHeader extends Component<Props, State> {
 		this.setState({
 			profileOpen: false,
 		})
+	}
+
+	handleUsersFetch = () => {
+		const { room } = this.props
+		if (room) {
+			this.props.getRoomUsers(room.id)
+		}
 	}
 
 	handleConfirmLeave = () => {
@@ -79,12 +88,12 @@ class AppHeader extends Component<Props, State> {
 				<Menu.Item onClick={this.handleConfirmLeave}>
 					<a>Leave chat</a>
 				</Menu.Item>
-				{/* <Menu.Item>
+				{/* {/* <Menu.Item>
 					<a>2nd menu item</a>
-				</Menu.Item>
-				<Menu.Item>
-					<a>3rd menu item</a>
 				</Menu.Item> */}
+				<Menu.Item onClick={this.handleUsersFetch}>
+					<a>Fetch room users</a>
+				</Menu.Item>
 			</Menu>
 		)
 		return (
@@ -134,11 +143,11 @@ const mapStateToProps = (state: StoreState) => {
 	const { auth } = state
 	return {
 		uid: auth.uid,
-		photoURL: auth.photoURL,
+		photoURL: auth.photoURL || undefined,
 	}
 }
 
 export default connect(
 	mapStateToProps,
-	{ tryLeaveRoom },
+	{ tryLeaveRoom, getRoomUsers },
 )(AppHeader)

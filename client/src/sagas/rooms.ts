@@ -1,9 +1,10 @@
-import { put, select, takeEvery, call } from 'redux-saga/effects'
+import { put, putResolve, select, takeEvery, call } from 'redux-saga/effects'
 import { AnyAction } from 'redux'
 import database, { rsf, functions } from '../firebase/firebase'
 import * as types from '../constants/ActionTypes'
 import { showError, updateRoom } from '../actions/rooms'
 import { fetchMessages, subscribeToLastMessage } from './messages'
+import { getRoomUsers } from '../actions/users'
 
 export function* updateRoomPresences() {
 	const auth = yield select(state => state.auth)
@@ -74,9 +75,14 @@ export function* fetchRoom(roomId: string) {
 			rsf.firestore.getCollection,
 			roomRef.collection('people'),
 		)
+	
 		peopleQuery.forEach((peopleDoc: any) => {
 			people.push({ id: peopleDoc.id, ...peopleDoc.data() })
 		})
+
+		// get user entities
+		// @ts-ignore
+		yield putResolve(getRoomUsers(roomId))
 
 		// get room's messages first page
 		const messages = yield call(fetchMessages, roomRef)

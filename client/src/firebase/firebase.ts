@@ -11,7 +11,7 @@ const config = {
 }
 const firebaseApp = firebase.initializeApp(config)
 const rsf = new ReduxSagaFirebase(firebaseApp)
-const database = firebase.firestore()
+const firestore = firebase.firestore()
 const functionsInstance = firebaseApp.functions('europe-west1')
 const githubAuthProvider = new firebase.auth.GithubAuthProvider()
 const googleAuthProvider = new firebase.auth.GoogleAuthProvider()
@@ -22,15 +22,17 @@ const auth = firebase.auth()
 const functions = {
 	sendMessage: functionsInstance.httpsCallable('sendMessage'),
 	joinRoom: functionsInstance.httpsCallable('joinRoom'),
-	leaveRoom: functionsInstance.httpsCallable('leaveRoom')
+	leaveRoom: functionsInstance.httpsCallable('leaveRoom'),
+	getRoomUsers: functionsInstance.httpsCallable('getRoomUsers')
 }
 
 export {
 	firebase,
 	functions,
+	firestore,
 	rsf,
 	auth,
 	githubAuthProvider,
 	googleAuthProvider,
-	database as default,
+	firestore as default,
 }

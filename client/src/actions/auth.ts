@@ -5,6 +5,7 @@ import {
 } from '../firebase/firebase'
 
 import * as types from '../constants/ActionTypes'
+import { updateUser } from './users'
 
 export const loginSuccess = (uid: string, userData: any) => ({
 	type: types.LOGIN_SUCCESS,
@@ -24,11 +25,15 @@ export const initAuth = () => {
 				// user authenticated, update redux
 				if (user) {
 					const userData = {
-						displayName: user.displayName || 'Ninja',
+						id: user.uid,
+						name: user.displayName || 'Ninja',
 						email: user.email,
 						photoURL: user.photoURL,
 					}
-					return dispatch(loginSuccess(user.uid, userData))
+					console.log({ userData, user })
+					dispatch(loginSuccess(user.uid, userData))
+					// TODO make this conditional
+					return dispatch(updateUser(userData))
 				}
 			} else {
 				// no saved user, create shadow

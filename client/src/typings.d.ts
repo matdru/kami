@@ -33,8 +33,15 @@ interface Message {
 interface Auth {
 	uid?: string
 	displayName?: string
-	photoURL?: string
+	photoURL?: string | null
 	email?: string
+}
+
+interface User {
+	id?: string
+	name?: string
+	photoURL?: string | null
+	status?: string
 }
 
 interface RoomItem {
@@ -52,7 +59,12 @@ interface Rooms {
 	available: { [key: string]: RoomItem }
 }
 
+interface Users {
+	[key: string]: User
+}
+
 interface StoreState {
 	auth: Auth
-	rooms: Rooms
+	rooms: Rooms,
+	users: Users
 }

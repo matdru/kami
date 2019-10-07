@@ -13,7 +13,30 @@ const getRoom = (state: StoreState, ownProps: any) => {
 const getRoomMessages = (state: StoreState, ownProps: any) => {
 	const { roomId } = ownProps.match.params
 	const room = state.rooms.active[roomId]
-	return room ? Object.values(room.messages).sort(byCreatedAt) : []
+	const messages = room ? Object.values(room.messages).sort(byCreatedAt) : []
+
+	// TODO figure out memoization function
+
+	// inject fresh user info to each message
+	const roomMessages = messages.map(message => {
+		if (message.sender.uid) {
+			const user = state.users[message.sender.uid]
+			// console.log({ message, user })
+			return {
+				...message,
+				sender: {
+					...message.sender,
+					photoURL: user.photoURL || undefined,
+					displayName: user.name || message.sender.displayName,
+				},
+			}
+		} else {
+			return message
+		}
+	})
+
+	console.log({ roomMessages })
+	return roomMessages
 }
 
 export const getEarliestMessageForRoomId = (roomId: string) => (
@@ -33,7 +56,7 @@ const getProps = createSelector(
 			auth,
 			room,
 			messages,
-			isLoading: !room
+			isLoading: !room,
 		}
 	},
 )

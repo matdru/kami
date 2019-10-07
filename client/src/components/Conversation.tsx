@@ -75,6 +75,7 @@ const Conversation = ({
 						messages[idx - 1].sender.uid === message.sender.uid
 					}
 					name={message.sender.displayName || 'Ninja'}
+					photoURL={message.sender.photoURL || undefined}
 					key={message.id}
 				>
 					{message.text}

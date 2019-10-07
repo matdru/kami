@@ -134,7 +134,6 @@ class RoomContainer extends Component<Props, State> {
 	handleLoadMoreVisibilityChange = (isVisible: any) => {
 		const { room } = this.props
 		if (isVisible && this.state.loadMoreVisible === false && room) {
-			console.log('load more messages')
 			this.props.tryFetchMoreMessages(room.id)
 		}
 

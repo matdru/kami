@@ -157,3 +157,36 @@ export const leaveRoom = functions
         });
     });
   });
+
+export const getRoomUsers = functions
+  .region("europe-west1")
+  .https.onCall((data, context) => {
+    // require auth
+    getAuth(context);
+
+    const { roomId } = data;
+
+    const roomMembersRef = firestore.collection(`rooms/${roomId}/people`);
+
+    return roomMembersRef.get().then(roomMembersCollection => {
+
+      const memberIds: string[] = [];
+
+      roomMembersCollection.forEach(member => {
+        memberIds.push(member.id);
+      });
+
+      console.log({ memberIds });
+
+      const userRefs = memberIds.map(id => firestore.doc(`users/${id}`));
+
+      return firestore.getAll(...userRefs).then(userSnapshots => {
+        const users: any[] = [];
+        userSnapshots.forEach(userDoc => {
+          users.push({ id: userDoc.id, ...userDoc.data() });
+        });
+
+        return users;
+      });
+    });
+  });
